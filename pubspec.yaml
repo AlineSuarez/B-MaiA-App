@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  speech_to_text: ^7.3.0
   permission_handler: ^11.3.1
   flutter_sound: ^9.2.13
   shared_preferences: ^2.2.2

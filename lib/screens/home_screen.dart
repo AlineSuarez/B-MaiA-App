@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -25,7 +26,6 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
 
-    // Animación más rápida para evitar lag con el teclado
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -34,14 +34,33 @@ class _HomeScreenState extends State<HomeScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
+
+    // Listener para detectar cambios en el foco del input
+    _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      // Cuando el input recibe foco, hacer scroll hacia abajo tras un pequeño delay
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted && _scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   void _unfocusInput() {
@@ -84,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el estado del tema
     final provider = Provider.of<ThemeProvider>(context);
     final platform = MediaQuery.of(context).platformBrightness;
     final themeMode = provider.themeMode;
@@ -100,7 +118,6 @@ class _HomeScreenState extends State<HomeScreen>
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardVisible = keyboardHeight > 0;
 
-    // Configurar la barra de estado según el tema - CORREGIDO
     final overlayStyle = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
@@ -113,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen>
           : Brightness.dark,
     );
 
-    // Aplicar el estilo de sistema ANTES de construir el Scaffold
     SystemChrome.setSystemUIOverlayStyle(overlayStyle);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -121,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen>
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: true, // Añadir esta línea
+        extendBodyBehindAppBar: true,
         drawer: const CustomDrawer(),
         drawerScrimColor: Colors.black.withValues(alpha: 0.6),
         onDrawerChanged: (isOpened) {
@@ -129,43 +145,71 @@ class _HomeScreenState extends State<HomeScreen>
             _unfocusInput();
           }
         },
+        resizeToAvoidBottomInset: true,
         body: BackgroundGradient(
-          // Mover SafeArea dentro de BackgroundGradient
           child: SafeArea(
             child: GestureDetector(
               onTap: _unfocusInput,
-              child: Column(
-                children: [
-                  // Header con logo y título
-                  isKeyboardVisible
-                      ? _buildHeader(isTablet, screenWidth, isDark)
-                      : FadeTransition(
-                          opacity: _fadeAnimation,
-                          child: _buildHeader(isTablet, screenWidth, isDark),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          children: [
+                            // Header compacto cuando hay teclado en landscape
+                            if (isLandscape && isKeyboardVisible)
+                              _buildCompactHeader(isTablet, screenWidth, isDark)
+                            else
+                              // Header normal
+                              isKeyboardVisible
+                                  ? _buildHeader(isTablet, screenWidth, isDark)
+                                  : FadeTransition(
+                                      opacity: _fadeAnimation,
+                                      child: _buildHeader(
+                                        isTablet,
+                                        screenWidth,
+                                        isDark,
+                                      ),
+                                    ),
+
+                            // Contenido principal flexible
+                            Expanded(
+                              child: isLandscape
+                                  ? _buildLandscapeLayout(
+                                      isTablet,
+                                      screenWidth,
+                                      screenHeight,
+                                      isKeyboardVisible,
+                                      isDark,
+                                    )
+                                  : _buildPortraitLayout(
+                                      isTablet,
+                                      screenWidth,
+                                      screenHeight,
+                                      isKeyboardVisible,
+                                      isDark,
+                                    ),
+                            ),
+
+                            // Input de mensaje con diseño adaptativo
+                            _buildMessageInput(
+                              isTablet,
+                              keyboardHeight,
+                              isDark,
+                              isLandscape,
+                            ),
+                          ],
                         ),
-
-                  // Contenido principal
-                  Expanded(
-                    child: isLandscape
-                        ? _buildLandscapeLayout(
-                            isTablet,
-                            screenWidth,
-                            screenHeight,
-                            isKeyboardVisible,
-                            isDark,
-                          )
-                        : _buildPortraitLayout(
-                            isTablet,
-                            screenWidth,
-                            screenHeight,
-                            isKeyboardVisible,
-                            isDark,
-                          ),
-                  ),
-
-                  // Input de mensaje
-                  _buildMessageInput(isTablet, keyboardHeight, isDark),
-                ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -174,83 +218,127 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildHeader(bool isTablet, double screenWidth, bool isDark) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.06,
-          vertical: isTablet ? 20 : 16,
-        ),
-        child: Row(
-          children: [
-            // Botón de menú
-            GestureDetector(
-              onTap: _openDrawerSafely,
-              child: Container(
-                padding: EdgeInsets.all(isTablet ? 12 : 10),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : const Color(0xFF2f43a7).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
-                ),
-                child: Icon(
-                  Icons.menu,
-                  color: isDark ? Colors.white : const Color(0xFF2f43a7),
-                  size: isTablet ? 24 : 20,
-                ),
+  // Header compacto para landscape + teclado
+  Widget _buildCompactHeader(bool isTablet, double screenWidth, bool isDark) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.04,
+        vertical: isTablet ? 8 : 6,
+      ),
+      child: Row(
+        children: [
+          // Botón de menú más pequeño
+          GestureDetector(
+            onTap: _openDrawerSafely,
+            child: Container(
+              padding: EdgeInsets.all(isTablet ? 8 : 6),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : const Color(0xFF2f43a7).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(isTablet ? 12 : 8),
               ),
-            ),
-
-            SizedBox(width: isTablet ? 16 : 12),
-
-            // Título
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'B-MaiA',
-                    style: TextStyle(
-                      fontSize: isTablet ? 24 : 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF2f43a7),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  Text(
-                    'Asistente inteligente',
-                    style: TextStyle(
-                      fontSize: isTablet ? 14 : 12,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.7)
-                          : const Color(0xFF2f43a7).withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Botón para abrir Onboarding
-            IconButton(
-              icon: Icon(
-                Icons.info_outline_rounded,
+              child: Icon(
+                Icons.menu,
                 color: isDark ? Colors.white : const Color(0xFF2f43a7),
-                size: isTablet ? 26 : 22,
+                size: isTablet ? 18 : 16,
               ),
-              tooltip: 'Ver introducción',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const OnboardingScreen(),
-                  ),
-                );
-              },
             ),
-          ],
-        ),
+          ),
+
+          SizedBox(width: isTablet ? 12 : 8),
+
+          // Título compacto
+          Expanded(
+            child: Text(
+              'B-MaiA',
+              style: TextStyle(
+                fontSize: isTablet ? 18 : 16,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(bool isTablet, double screenWidth, bool isDark) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.06,
+        vertical: isTablet ? 20 : 16,
+      ),
+      child: Row(
+        children: [
+          // Botón de menú
+          GestureDetector(
+            onTap: _openDrawerSafely,
+            child: Container(
+              padding: EdgeInsets.all(isTablet ? 12 : 10),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : const Color(0xFF2f43a7).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
+              ),
+              child: Icon(
+                Icons.menu,
+                color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                size: isTablet ? 24 : 20,
+              ),
+            ),
+          ),
+
+          SizedBox(width: isTablet ? 16 : 12),
+
+          // Título
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'B-MaiA',
+                  style: TextStyle(
+                    fontSize: isTablet ? 24 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  'Asistente inteligente',
+                  style: TextStyle(
+                    fontSize: isTablet ? 14 : 12,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.7)
+                        : const Color(0xFF2f43a7).withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Botón para abrir Onboarding
+          IconButton(
+            icon: Icon(
+              Icons.info_outline_rounded,
+              color: isDark ? Colors.white : const Color(0xFF2f43a7),
+              size: isTablet ? 26 : 22,
+            ),
+            tooltip: 'Ver introducción',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const OnboardingScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -265,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen>
     final child = Container(
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.06,
-        vertical: isTablet ? 16 : 12,
+        vertical: isTablet ? 12 : 8,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -273,9 +361,9 @@ class _HomeScreenState extends State<HomeScreen>
           // Mensaje de bienvenida principal
           _buildWelcomeMessage(isTablet, screenWidth, isDark),
 
-          // Sugerencias de preguntas
+          // Sugerencias de preguntas (solo si no hay teclado)
           if (!isKeyboardVisible) ...[
-            SizedBox(height: isTablet ? 32 : 24),
+            SizedBox(height: isTablet ? 24 : 16),
             _buildSuggestions(isTablet, screenWidth, isDark),
           ],
         ],
@@ -293,8 +381,47 @@ class _HomeScreenState extends State<HomeScreen>
     bool isKeyboardVisible,
     bool isDark,
   ) {
+    // En landscape con teclado, simplificar la UI
+    if (isKeyboardVisible) {
+      return Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: isTablet ? 4 : 2,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Solo mensaje compacto cuando hay teclado
+            Text(
+              '¡Hola! Soy B-MaiA',
+              style: TextStyle(
+                fontSize: isTablet ? 18 : 14,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: isTablet ? 4 : 2),
+            Text(
+              'Tu asistente de inteligencia artificial',
+              style: TextStyle(
+                fontSize: isTablet ? 10 : 8,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : const Color(0xFF2f43a7).withValues(alpha: 0.8),
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Layout normal sin teclado
     final child = Container(
-      padding: EdgeInsets.symmetric(vertical: isTablet ? 16 : 12),
+      padding: EdgeInsets.symmetric(vertical: isTablet ? 12 : 8),
       child: Row(
         children: [
           // Lado izquierdo - Mensaje de bienvenida
@@ -318,30 +445,27 @@ class _HomeScreenState extends State<HomeScreen>
           ),
 
           // Lado derecho - Sugerencias
-          if (!isKeyboardVisible)
-            Expanded(
-              flex: 4,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildSuggestions(
-                      isTablet,
-                      screenWidth,
-                      isDark,
-                      isLandscape: true,
-                    ),
-                  ],
-                ),
+          Expanded(
+            flex: 4,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildSuggestions(
+                    isTablet,
+                    screenWidth,
+                    isDark,
+                    isLandscape: true,
+                  ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );
-    return isKeyboardVisible
-        ? child
-        : FadeTransition(opacity: _fadeAnimation, child: child);
+    return FadeTransition(opacity: _fadeAnimation, child: child);
   }
 
   Widget _buildWelcomeMessage(
@@ -477,7 +601,25 @@ class _HomeScreenState extends State<HomeScreen>
   ) {
     return GestureDetector(
       onTap: () {
-        _messageController.text = text;
+        // Combinar texto existente con sugerencia
+        final currentText = _messageController.text;
+        String finalText;
+
+        if (currentText.isNotEmpty) {
+          final needsSpace =
+              !currentText.endsWith(' ') && !currentText.endsWith('\n');
+          finalText = currentText + (needsSpace ? ' ' : '') + text;
+        } else {
+          finalText = text;
+        }
+
+        _messageController.text = finalText;
+        _messageController.selection = TextSelection.fromPosition(
+          TextPosition(offset: finalText.length),
+        );
+
+        // Enfocar el input después de agregar la sugerencia
+        _focusNode.requestFocus();
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -520,16 +662,32 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildMessageInput(bool isTablet, double keyboardHeight, bool isDark) {
-    final double maxInputHeight = isTablet ? 100.0 : 80.0;
-    final double minInputHeight = isTablet ? 52.0 : 44.0;
+  Widget _buildMessageInput(
+    bool isTablet,
+    double keyboardHeight,
+    bool isDark,
+    bool isLandscape,
+  ) {
+    // Adaptar altura según orientación y teclado
+    final double maxInputHeight;
+    final double minInputHeight;
+
+    if (isLandscape && keyboardHeight > 0) {
+      // En landscape con teclado, hacer input más compacto
+      maxInputHeight = isTablet ? 50.0 : 40.0;
+      minInputHeight = isTablet ? 36.0 : 32.0;
+    } else {
+      // Tamaños normales
+      maxInputHeight = isTablet ? 100.0 : 80.0;
+      minInputHeight = isTablet ? 52.0 : 44.0;
+    }
 
     return Container(
       padding: EdgeInsets.fromLTRB(
         isTablet ? 20 : 16,
-        isTablet ? 12 : 10,
+        isTablet ? 8 : 6,
         isTablet ? 20 : 16,
-        (isTablet ? 20 : 16) + (keyboardHeight > 0 ? 6 : 0),
+        (isTablet ? 16 : 12) + (keyboardHeight > 0 ? 4 : 0),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -568,7 +726,9 @@ class _HomeScreenState extends State<HomeScreen>
                       height: 1.3,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Escribe tu mensaje...',
+                      hintText: isLandscape && keyboardHeight > 0
+                          ? 'Escribe...'
+                          : 'Escribe tu mensaje...',
                       hintStyle: TextStyle(
                         color: isDark
                             ? Colors.white.withValues(alpha: 0.5)
@@ -577,12 +737,12 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 18 : 14,
-                        vertical: isTablet ? 14 : 12,
+                        horizontal: isTablet ? 16 : 12,
+                        vertical: isTablet ? 12 : 10,
                       ),
                       isDense: true,
                     ),
-                    maxLines: null,
+                    maxLines: isLandscape && keyboardHeight > 0 ? 2 : null,
                     minLines: 1,
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
@@ -594,7 +754,7 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
 
-          SizedBox(width: isTablet ? 10 : 8),
+          SizedBox(width: isTablet ? 12 : 8),
 
           // Botón de enviar
           GestureDetector(
