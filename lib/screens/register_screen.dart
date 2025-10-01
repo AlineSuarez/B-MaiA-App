@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'home_screen.dart';
-import 'forgot_password_screen.dart';
-import 'register_screen.dart';
 import '../widgets/custom_text_field.dart';
+import 'home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _RegisterScreenState extends State<RegisterScreen>
     with TickerProviderStateMixin {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  final FocusNode _nameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
 
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -26,8 +28,10 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<Offset> _slideAnimation;
 
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   bool _isLoadingEmail = false;
   bool _isLoadingGoogle = false;
+  bool _acceptTerms = false;
 
   @override
   void initState() {
@@ -64,33 +68,65 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _nameFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
     _fadeController.dispose();
     _slideController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleEmailLogin() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+  Future<void> _handleEmailRegister() async {
+    // Validaciones
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
       _showErrorMessage('Por favor, completa todos los campos');
       return;
     }
+
+    if (_nameController.text.length < 3) {
+      _showErrorMessage('El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(_emailController.text)) {
+      _showErrorMessage('Por favor, ingresa un correo electrónico válido');
+      return;
+    }
+
+    if (_passwordController.text.length < 6) {
+      _showErrorMessage('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showErrorMessage('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (!_acceptTerms) {
+      _showErrorMessage('Debes aceptar los términos y condiciones');
+      return;
+    }
+
     setState(() {
       _isLoadingEmail = true;
     });
-    await Future.delayed(const Duration(seconds: 2));
 
-    // Guardar estado de sesión
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-    await prefs.setString('userEmail', _emailController.text);
+    await Future.delayed(const Duration(seconds: 2));
 
     setState(() {
       _isLoadingEmail = false;
     });
+
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -98,20 +134,17 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
+  Future<void> _handleGoogleRegister() async {
     setState(() {
       _isLoadingGoogle = true;
     });
-    await Future.delayed(const Duration(seconds: 2));
 
-    // Guardar estado de sesión
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-    await prefs.setString('loginMethod', 'google');
+    await Future.delayed(const Duration(seconds: 2));
 
     setState(() {
       _isLoadingGoogle = false;
     });
+
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -132,11 +165,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _handleBackButton() {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-    } else {
-      SystemNavigator.pop();
-    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -149,7 +178,6 @@ class _LoginScreenState extends State<LoginScreen>
     final isLandscape = orientation == Orientation.landscape;
     final keyboardHeight = media.viewInsets.bottom;
 
-    // Espaciados y tamaños adaptativos
     final horizontalPadding = isTablet ? 64.0 : 24.0;
     final verticalPadding = isTablet ? 32.0 : 16.0;
     final logoSize = isTablet ? 64.0 : 48.0;
@@ -172,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen>
           child: LayoutBuilder(
             builder: (context, constraints) {
               if (!isLandscape) {
-                // VERTICAL: SIEMPRE muestra el texto de bienvenida
+                // VERTICAL
                 return SingleChildScrollView(
                   padding: EdgeInsets.only(bottom: keyboardHeight),
                   child: ConstrainedBox(
@@ -197,33 +225,11 @@ class _LoginScreenState extends State<LoginScreen>
                                 children: [
                                   _buildLogoSection(logoSize, isTablet),
                                   SizedBox(height: isTablet ? 32 : 24),
-                                  // TEXTO DE BIENVENIDA
-                                  Text(
-                                    'Bienvenido',
-                                    style: TextStyle(
-                                      fontSize: isTablet ? 28 : 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: -0.5,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  SizedBox(height: isTablet ? 8 : 6),
-                                  Text(
-                                    'Inicia sesión para continuar con B-MaiA',
-                                    style: TextStyle(
-                                      fontSize: isTablet ? 14 : 12,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
+                                  _buildTitle(isTablet),
                                   SizedBox(height: isTablet ? 32 : 24),
-                                  _buildLoginForm(isTablet),
+                                  _buildRegisterForm(isTablet),
                                   SizedBox(height: isTablet ? 24 : 20),
-                                  _buildGoogleLoginButton(isTablet),
+                                  _buildGoogleRegisterButton(isTablet),
                                   SizedBox(height: isTablet ? 20 : 16),
                                   _buildFooter(isTablet),
                                 ],
@@ -236,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 );
               } else {
-                // HORIZONTAL: TEXTO ADAPTATIVO Y FLEXIBLE
+                // HORIZONTAL
                 return Row(
                   children: [
                     Expanded(
@@ -256,41 +262,7 @@ class _LoginScreenState extends State<LoginScreen>
                               children: [
                                 _buildLogoSection(logoSize, isTablet),
                                 SizedBox(height: isTablet ? 24 : 18),
-                                // TEXTO DE BIENVENIDA ADAPTATIVO
-                                Flexible(
-                                  child: Text(
-                                    'Bienvenido',
-                                    style: TextStyle(
-                                      fontSize: isTablet
-                                          ? (screenWidth > 900 ? 32 : 24)
-                                          : 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: -0.5,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                SizedBox(height: isTablet ? 8 : 6),
-                                Flexible(
-                                  child: Text(
-                                    'Inicia sesión para continuar con B-MaiA',
-                                    style: TextStyle(
-                                      fontSize: isTablet
-                                          ? (screenWidth > 900 ? 16 : 13)
-                                          : 11,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
+                                Flexible(child: _buildTitle(isTablet)),
                               ],
                             ),
                           ),
@@ -314,9 +286,9 @@ class _LoginScreenState extends State<LoginScreen>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _buildLoginForm(isTablet),
+                                  _buildRegisterForm(isTablet),
                                   SizedBox(height: isTablet ? 24 : 20),
-                                  _buildGoogleLoginButton(isTablet),
+                                  _buildGoogleRegisterButton(isTablet),
                                   SizedBox(height: isTablet ? 20 : 16),
                                   _buildFooter(isTablet),
                                 ],
@@ -397,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
           child: Icon(
-            Icons.auto_awesome_rounded,
+            Icons.person_add_alt_1_rounded,
             color: Colors.white,
             size: logoSize,
           ),
@@ -406,11 +378,51 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildLoginForm(bool isTablet) {
+  Widget _buildTitle(bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
         children: [
+          Text(
+            'Crear Cuenta',
+            style: TextStyle(
+              fontSize: isTablet ? 28 : 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: -0.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: isTablet ? 8 : 6),
+          Text(
+            'Únete a B-MaiA y comienza tu experiencia',
+            style: TextStyle(
+              fontSize: isTablet ? 14 : 12,
+              color: Colors.white.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRegisterForm(bool isTablet) {
+    return SlideTransition(
+      position: _slideAnimation,
+      child: Column(
+        children: [
+          CustomTextField(
+            controller: _nameController,
+            focusNode: _nameFocus,
+            hintText: 'Nombre completo',
+            keyboardType: TextInputType.name,
+            prefixIcon: Icons.person_outline_rounded,
+            isTablet: isTablet,
+            onSubmitted: (_) => _emailFocus.requestFocus(),
+          ),
+          SizedBox(height: isTablet ? 16 : 12),
           CustomTextField(
             controller: _emailController,
             focusNode: _emailFocus,
@@ -440,13 +452,39 @@ class _LoginScreenState extends State<LoginScreen>
                 size: isTablet ? 20 : 18,
               ),
             ),
-            onSubmitted: (_) => _handleEmailLogin(),
+            onSubmitted: (_) => _confirmPasswordFocus.requestFocus(),
           ),
+          SizedBox(height: isTablet ? 16 : 12),
+          CustomTextField(
+            controller: _confirmPasswordController,
+            focusNode: _confirmPasswordFocus,
+            hintText: 'Confirmar contraseña',
+            obscureText: !_isConfirmPasswordVisible,
+            prefixIcon: Icons.lock_outline_rounded,
+            isTablet: isTablet,
+            suffixIcon: IconButton(
+              onPressed: () {
+                setState(
+                  () => _isConfirmPasswordVisible = !_isConfirmPasswordVisible,
+                );
+              },
+              icon: Icon(
+                _isConfirmPasswordVisible
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: Colors.white.withValues(alpha: 0.6),
+                size: isTablet ? 20 : 18,
+              ),
+            ),
+            onSubmitted: (_) => _handleEmailRegister(),
+          ),
+          SizedBox(height: isTablet ? 16 : 12),
+          _buildTermsCheckbox(isTablet),
           SizedBox(height: isTablet ? 24 : 20),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _isLoadingEmail ? null : _handleEmailLogin,
+              onPressed: _isLoadingEmail ? null : _handleEmailRegister,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4a5bb8),
                 foregroundColor: Colors.white,
@@ -467,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     )
                   : Text(
-                      'Iniciar Sesión',
+                      'Registrarse',
                       style: TextStyle(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
@@ -481,7 +519,62 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildGoogleLoginButton(bool isTablet) {
+  Widget _buildTermsCheckbox(bool isTablet) {
+    return Row(
+      children: [
+        SizedBox(
+          height: isTablet ? 24 : 20,
+          width: isTablet ? 24 : 20,
+          child: Checkbox(
+            value: _acceptTerms,
+            onChanged: (value) {
+              setState(() {
+                _acceptTerms = value ?? false;
+              });
+            },
+            activeColor: const Color(0xFF4a5bb8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.4),
+              width: 1.5,
+            ),
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Wrap(
+            children: [
+              Text(
+                'Acepto los ',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: isTablet ? 12 : 11,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  // TODO: Mostrar términos y condiciones
+                },
+                child: Text(
+                  'términos y condiciones',
+                  style: TextStyle(
+                    color: const Color(0xFF4a5bb8),
+                    fontSize: isTablet ? 12 : 11,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGoogleRegisterButton(bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -505,7 +598,7 @@ class _LoginScreenState extends State<LoginScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'o continúa con',
+                  'o regístrate con',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: isTablet ? 12 : 11,
@@ -533,7 +626,7 @@ class _LoginScreenState extends State<LoginScreen>
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _isLoadingGoogle ? null : _handleGoogleLogin,
+              onPressed: _isLoadingGoogle ? null : _handleGoogleRegister,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black87,
@@ -586,59 +679,31 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildFooter(bool isTablet) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(
+            '¿Ya tienes cuenta? ',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: isTablet ? 12 : 11,
+            ),
+          ),
           TextButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ForgotPasswordScreen(),
-                ),
-              );
-            },
+            onPressed: _handleBackButton,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             child: Text(
-              '¿Olvidaste tu contraseña?',
+              'Inicia sesión',
               style: TextStyle(
                 color: const Color(0xFF4a5bb8),
                 fontSize: isTablet ? 12 : 11,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-          SizedBox(height: isTablet ? 8 : 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '¿No tienes cuenta? ',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: isTablet ? 12 : 11,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterScreen(),
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'Regístrate',
-                  style: TextStyle(
-                    color: const Color(0xFF4a5bb8),
-                    fontSize: isTablet ? 12 : 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),

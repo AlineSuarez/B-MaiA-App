@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import 'package:bmaia/screens/settings_screen.dart';
+import 'package:bmaia/screens/profile_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -482,7 +483,9 @@ class CustomDrawer extends StatelessWidget {
             isDark: isDark,
             onTap: () {
               Navigator.pop(context);
-              // TODO: Abrir perfil
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
             },
           ),
         ],
