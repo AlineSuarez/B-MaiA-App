@@ -3,12 +3,15 @@ import 'api_client.dart';
 class ProfileService {
   final _api = ApiClient();
 
+  /// Devuelve el usuario autenticado
+  /// Base: http://.../api/v1 ; Endpoint: /user
   Future<Map<String, dynamic>> me() async {
-    final res = await _api.dio.get('/user'); // -> /api/v1/user (con token)
+    final res = await _api.dio.get('/user');
     return Map<String, dynamic>.from(res.data);
   }
 
-  // si luego quieres actualizar datos:
+  /// Actualización parcial de perfil (si tu backend lo soporta)
+  /// Base: http://.../api/v1 ; Endpoint: /me
   Future<Map<String, dynamic>> updateProfile(
     Map<String, dynamic> payload,
   ) async {

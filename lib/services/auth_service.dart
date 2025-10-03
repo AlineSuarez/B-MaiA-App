@@ -10,6 +10,7 @@ class AuthService {
     String device = 'flutter-app',
   }) async {
     try {
+      // Base: http://.../api/v1 ; Endpoint: /login
       final res = await _api.dio.post(
         '/login',
         data: {'email': email, 'password': password, 'device': device},
@@ -17,9 +18,8 @@ class AuthService {
 
       final data = Map<String, dynamic>.from(res.data);
       final token = data['token'] as String?;
-      if (token == null) {
-        throw Exception('Respuesta inválida del servidor');
-      }
+      if (token == null) throw Exception('Respuesta inválida del servidor');
+
       await _api.saveToken(token);
       return data; // { token, user:{...} }
     } on DioException catch (e) {
@@ -47,7 +47,6 @@ class AuthService {
     String device = 'flutter-app',
   }) async {
     try {
-      // Muchos backends exigen password_confirmation
       final res = await _api.dio.post(
         '/register',
         data: {
@@ -69,7 +68,9 @@ class AuthService {
       final body = e.response?.data;
       final serverMsg = body is Map
           ? (body['message'] ??
-                (body['errors']?.values?.first?.first ?? body.toString()))
+                (body['errors'] is Map
+                    ? (body['errors'] as Map).values.first?.toString()
+                    : body.toString()))
           : null;
       throw Exception(serverMsg ?? 'No se pudo registrar');
     } catch (e) {
@@ -77,8 +78,9 @@ class AuthService {
     }
   }
 
+  /// Perfil básico autenticado
   Future<Map<String, dynamic>> me() async {
-    final res = await _api.dio.get('/user'); // en tu backend es /api/v1/user
+    final res = await _api.dio.get('/user'); // /api/v1/user
     return Map<String, dynamic>.from(res.data);
   }
 

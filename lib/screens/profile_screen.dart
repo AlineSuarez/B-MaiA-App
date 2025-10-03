@@ -1,14 +1,14 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../config/api_config.dart'; // define ApiConfig.baseUrl
 import '../providers/theme_provider.dart';
 import '../widgets/background_gradient.dart';
+import '../services/profile_service.dart';
+import '../services/api_client.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -21,7 +21,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   // estado
   bool _loading = true;
-  bool _isAuthed = false;
 
   // datos de perfil (todo opcional; si no hay => “—”)
   String? _avatarUrl;
@@ -41,15 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _sagRegistro;
 
   final ImagePicker _picker = ImagePicker();
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: const Duration(seconds: 8),
-      receiveTimeout: const Duration(seconds: 12),
-      sendTimeout: const Duration(seconds: 12),
-      headers: {'Accept': 'application/json'},
-    ),
-  );
+  final _profileService = ProfileService();
 
   @override
   void initState() {
@@ -86,43 +77,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // -------- API: /v1/me --------
+  // -------- API: /user (via ProfileService/ApiClient) --------
   Future<void> _fetchMe() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-
-      if (token == null || token.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _isAuthed = false;
-            _loading = false;
-          });
-        }
-        return;
-      }
-
-      _isAuthed = true;
-      _dio.options.headers['Authorization'] = 'Bearer $token';
-
-      final res = await _dio.get('/v1/me');
-      final data = (res.data is Map && res.data['data'] != null)
-          ? (res.data['data'] as Map<String, dynamic>)
-          : (res.data as Map<String, dynamic>);
+      final map = Map<String, dynamic>.from(await _profileService.me());
+      final data = map['data'] is Map<String, dynamic>
+          ? Map<String, dynamic>.from(map['data'])
+          : map;
 
       _applyMe(data);
       if (mounted) setState(() => _loading = false);
-    } on DioException catch (e) {
+    } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
-      final msg = e.response?.statusCode == 401
-          ? 'Sesión expirada. Inicia sesión de nuevo'
-          : (e.message ?? 'No se pudo cargar el perfil');
-      _showErrorMessage(msg);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-      _showErrorMessage('No se pudo cargar el perfil');
+      _showErrorMessage(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
@@ -131,21 +99,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _nombres = m['name']?.toString();
       _apellidos = m['last_name']?.toString();
       _correo = m['email']?.toString();
-      _telefono = m['phone']?.toString();
-      _memberSince = (m['member_since'] ?? m['created_at'])?.toString();
+      _telefono = (m['telefono'] ?? m['phone'])?.toString();
+      _memberSince = (m['created_at'] ?? m['member_since'])?.toString();
 
       _rut = m['rut']?.toString();
       _razonSocial = m['razon_social']?.toString();
+      _sagRegistro = (m['numero_registro'] ?? m['sag_registro'])?.toString();
 
-      final region = m['region'];
-      _region = region is Map ? region['name']?.toString() : region?.toString();
+      final idRegion = m['id_region'];
+      final idComuna = m['id_comuna'];
+      _region = (idRegion == null) ? null : 'ID región: $idRegion';
+      _comuna = (idComuna == null) ? null : 'ID comuna: $idComuna';
 
-      final comuna = m['comuna'];
-      _comuna = comuna is Map ? comuna['name']?.toString() : comuna?.toString();
+      _direccion = m['direccion']?.toString();
 
-      _direccion = (m['address'] ?? m['direccion'])?.toString();
-      _sagRegistro = (m['sag_registro'] ?? m['numero_registro'])?.toString();
-      _avatarUrl = (m['avatar_url'] ?? m['profile_picture'])?.toString();
+      final pp = (m['profile_picture'] ?? m['avatar_url'])?.toString();
+      _avatarUrl = _resolveUrl(pp);
     });
   }
 
@@ -700,7 +669,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Action tile (para Seguridad / Preferencias)
   Widget _buildActionTile({
     required IconData icon,
     required String title,
@@ -762,7 +730,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Card de suscripción (botón con TODO)
   Widget _buildSubscriptionCard(bool isDark, bool isTablet) {
     return Card(
       color: isDark
@@ -893,7 +860,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             _buildInfoRow(
               'ID de usuario',
-              _isAuthed ? '—' : '—', // mapea si tu /v1/me trae 'id'
+              '—', // Mapea y muestra si tu /user trae 'id'
               Icons.fingerprint_rounded,
               isDark,
               isTablet,
@@ -984,6 +951,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _display(String? v) =>
       (v == null || v.trim().isEmpty) ? '—' : v.trim();
 
+  // Resolver URL absoluta de imagen de perfil (si viene relativa)
+  String? _resolveUrl(String? path) {
+    if (path == null || path.isEmpty) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+
+    final origin = ApiClient.origin;
+    final cleaned = path.startsWith('/') ? path.substring(1) : path;
+    return '$origin/$cleaned'.replaceAll('//', '/').replaceFirst(':/', '://');
+  }
+
   // diálogos (logout / eliminar)
   void _showLogoutDialog(bool isDark) {
     showDialog(
@@ -1029,17 +1006,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
+              // Capturamos el Navigator antes del async gap
               final navigator = Navigator.of(context);
+              // Cerramos el diálogo
               navigator.pop();
+
+              // Limpieza local
               final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('auth_token');
               await prefs.remove('me');
               await prefs.setBool('isLoggedIn', false);
               await prefs.remove('userEmail');
               await prefs.remove('loginMethod');
-              if (!mounted) return;
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              await ApiClient().clearToken();
+
+              // Usamos el navigator capturado (no el context)
+              navigator.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (ctx) => const LoginScreen()),
                 (route) => false,
               );
             },
