@@ -1,5 +1,10 @@
+// lib/screens/register_screen.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../widgets/custom_text_field.dart';
+import '../services/auth_service.dart';
 import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -11,6 +16,8 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen>
     with TickerProviderStateMixin {
+  final _auth = AuthService();
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -36,34 +43,24 @@ class _RegisterScreenState extends State<RegisterScreen>
   @override
   void initState() {
     super.initState();
-    _initializeAnimations();
-  }
-
-  void _initializeAnimations() {
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
-
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
           CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
         );
-
     _fadeController.forward();
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _slideController.forward();
-    });
+    Future.delayed(const Duration(milliseconds: 200), _slideController.forward);
   }
 
   @override
@@ -82,74 +79,77 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   Future<void> _handleEmailRegister() async {
-    // Validaciones
+    // Validaciones de UI
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
-      _showErrorMessage('Por favor, completa todos los campos');
-      return;
+      return _showErrorMessage('Por favor, completa todos los campos');
     }
-
-    if (_nameController.text.length < 3) {
-      _showErrorMessage('El nombre debe tener al menos 3 caracteres');
-      return;
+    if (_nameController.text.trim().length < 3) {
+      return _showErrorMessage('El nombre debe tener al menos 3 caracteres');
     }
-
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(_emailController.text)) {
-      _showErrorMessage('Por favor, ingresa un correo electrónico válido');
-      return;
+    if (!emailRegex.hasMatch(_emailController.text.trim())) {
+      return _showErrorMessage('Ingresa un correo electrónico válido');
     }
-
     if (_passwordController.text.length < 6) {
-      _showErrorMessage('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    if (_passwordController.text != _confirmPasswordController.text) {
-      _showErrorMessage('Las contraseñas no coinciden');
-      return;
-    }
-
-    if (!_acceptTerms) {
-      _showErrorMessage('Debes aceptar los términos y condiciones');
-      return;
-    }
-
-    setState(() {
-      _isLoadingEmail = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      _isLoadingEmail = false;
-    });
-
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      return _showErrorMessage(
+        'La contraseña debe tener al menos 6 caracteres',
       );
+    }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      return _showErrorMessage('Las contraseñas no coinciden');
+    }
+    if (!_acceptTerms) {
+      return _showErrorMessage('Debes aceptar los términos y condiciones');
+    }
+
+    setState(() => _isLoadingEmail = true);
+
+    try {
+      // Llamada real al backend: /api/v1/register
+      final data = await _auth.register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      // Persistimos sesión mínima y el perfil
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString(
+        'userEmail',
+        data['user']?['email'] ?? _emailController.text.trim(),
+      );
+
+      if (data['user'] != null) {
+        await prefs.setString('me', jsonEncode(data['user']));
+      } else {
+        // Si por alguna razón el endpoint no devuelve user, ‘me’ lo trae:
+        final me = await _auth.me();
+        await prefs.setString('me', jsonEncode(me));
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('¡Registro exitoso!')));
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+    } catch (e) {
+      _showErrorMessage(e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _isLoadingEmail = false);
     }
   }
 
   Future<void> _handleGoogleRegister() async {
-    setState(() {
-      _isLoadingGoogle = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      _isLoadingGoogle = false;
-    });
-
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    }
+    setState(() => _isLoadingGoogle = true);
+    // Aquí iría tu flujo de Google Sign-In si lo integras luego
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) setState(() => _isLoadingGoogle = false);
   }
 
   void _showErrorMessage(String message) {
@@ -164,9 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  void _handleBackButton() {
-    Navigator.of(context).pop();
-  }
+  void _handleBackButton() => Navigator.of(context).pop();
 
   @override
   Widget build(BuildContext context) {
@@ -199,50 +197,43 @@ class _RegisterScreenState extends State<RegisterScreen>
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
+              final form = Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: contentMaxWidth),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLogoSection(logoSize, isTablet),
+                        SizedBox(height: isTablet ? 32 : 24),
+                        _buildTitle(isTablet),
+                        SizedBox(height: isTablet ? 32 : 24),
+                        _buildRegisterForm(isTablet),
+                        SizedBox(height: isTablet ? 24 : 20),
+                        _buildGoogleRegisterButton(isTablet),
+                        SizedBox(height: isTablet ? 20 : 16),
+                        _buildFooter(isTablet),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+
               if (!isLandscape) {
-                // VERTICAL
                 return SingleChildScrollView(
                   padding: EdgeInsets.only(bottom: keyboardHeight),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
                     ),
-                    child: Column(
-                      children: [
-                        _buildHeader(),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: horizontalPadding,
-                            vertical: verticalPadding,
-                          ),
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: contentMaxWidth,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildLogoSection(logoSize, isTablet),
-                                  SizedBox(height: isTablet ? 32 : 24),
-                                  _buildTitle(isTablet),
-                                  SizedBox(height: isTablet ? 32 : 24),
-                                  _buildRegisterForm(isTablet),
-                                  SizedBox(height: isTablet ? 24 : 20),
-                                  _buildGoogleRegisterButton(isTablet),
-                                  SizedBox(height: isTablet ? 20 : 16),
-                                  _buildFooter(isTablet),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: Column(children: [_buildHeader(), form]),
                   ),
                 );
               } else {
-                // HORIZONTAL
                 return Row(
                   children: [
                     Expanded(
@@ -278,22 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             constraints: BoxConstraints(
                               maxWidth: contentMaxWidth,
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: horizontalPadding,
-                                vertical: verticalPadding,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildRegisterForm(isTablet),
-                                  SizedBox(height: isTablet ? 24 : 20),
-                                  _buildGoogleRegisterButton(isTablet),
-                                  SizedBox(height: isTablet ? 20 : 16),
-                                  _buildFooter(isTablet),
-                                ],
-                              ),
-                            ),
+                            child: form,
                           ),
                         ),
                       ),
@@ -441,9 +417,8 @@ class _RegisterScreenState extends State<RegisterScreen>
             prefixIcon: Icons.lock_outline_rounded,
             isTablet: isTablet,
             suffixIcon: IconButton(
-              onPressed: () {
-                setState(() => _isPasswordVisible = !_isPasswordVisible);
-              },
+              onPressed: () =>
+                  setState(() => _isPasswordVisible = !_isPasswordVisible),
               icon: Icon(
                 _isPasswordVisible
                     ? Icons.visibility_off_outlined
@@ -463,11 +438,9 @@ class _RegisterScreenState extends State<RegisterScreen>
             prefixIcon: Icons.lock_outline_rounded,
             isTablet: isTablet,
             suffixIcon: IconButton(
-              onPressed: () {
-                setState(
-                  () => _isConfirmPasswordVisible = !_isConfirmPasswordVisible,
-                );
-              },
+              onPressed: () => setState(
+                () => _isConfirmPasswordVisible = !_isConfirmPasswordVisible,
+              ),
               icon: Icon(
                 _isConfirmPasswordVisible
                     ? Icons.visibility_off_outlined
@@ -527,11 +500,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           width: isTablet ? 24 : 20,
           child: Checkbox(
             value: _acceptTerms,
-            onChanged: (value) {
-              setState(() {
-                _acceptTerms = value ?? false;
-              });
-            },
+            onChanged: (v) => setState(() => _acceptTerms = v ?? false),
             activeColor: const Color(0xFF4a5bb8),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
@@ -542,7 +511,7 @@ class _RegisterScreenState extends State<RegisterScreen>
             ),
           ),
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: Wrap(
             children: [
@@ -554,9 +523,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  // TODO: Mostrar términos y condiciones
-                },
+                onTap: () {},
                 child: Text(
                   'términos y condiciones',
                   style: TextStyle(
@@ -581,20 +548,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         children: [
           Row(
             children: [
-              Expanded(
-                child: Container(
-                  height: 1,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Colors.white.withValues(alpha: 0.3),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              Expanded(child: Container(height: 1, decoration: _gradLine())),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -606,20 +560,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   ),
                 ),
               ),
-              Expanded(
-                child: Container(
-                  height: 1,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Colors.white.withValues(alpha: 0.3),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              Expanded(child: Container(height: 1, decoration: _gradLine())),
             ],
           ),
           SizedBox(height: isTablet ? 20 : 16),
@@ -657,7 +598,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           height: isTablet ? 22 : 18,
                           width: isTablet ? 22 : 18,
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Text(
                           'Continuar con Google',
                           style: TextStyle(
@@ -675,6 +616,16 @@ class _RegisterScreenState extends State<RegisterScreen>
       ),
     );
   }
+
+  BoxDecoration _gradLine() => BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.transparent,
+        Colors.white.withValues(alpha: 0.3),
+        Colors.transparent,
+      ],
+    ),
+  );
 
   Widget _buildFooter(bool isTablet) {
     return FadeTransition(

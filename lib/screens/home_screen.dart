@@ -530,7 +530,8 @@ class _HomeScreenState extends State<HomeScreen>
               child: TextField(
                 controller: _messageController,
                 focusNode: _focusNode,
-                enabled: !isTyping,
+                //enabled: !isTyping, cuando se integre el chat real se descomenta
+                enabled: true,
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF2f43a7),
                   fontSize: isTablet ? 15 : 14,

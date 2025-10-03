@@ -5,6 +5,7 @@ import 'home_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 import '../widgets/custom_text_field.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
+  final _auth = AuthService();
 
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -74,27 +76,49 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleEmailLogin() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    final email = _emailController.text.trim();
+    final pass = _passwordController.text;
+
+    if (email.isEmpty || pass.isEmpty) {
       _showErrorMessage('Por favor, completa todos los campos');
       return;
     }
-    setState(() {
-      _isLoadingEmail = true;
-    });
-    await Future.delayed(const Duration(seconds: 2));
 
-    // Guardar estado de sesión
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-    await prefs.setString('userEmail', _emailController.text);
+    setState(() => _isLoadingEmail = true);
 
-    setState(() {
-      _isLoadingEmail = false;
-    });
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+    try {
+      // Llama al backend: POST /api/v1/login
+      final data = await _auth.login(email: email, password: pass);
+      // data deberia traer { token:"...", user:{ id, name, email } }
+
+      // Guarda estado de sesión mínimo para tu app
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('userEmail', data['user']?['email'] ?? email);
+
+      if (!mounted) return;
+
+      // Mensaje de bienvenida visible
+      final nombre = (data['user']?['name'] ?? '').toString();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            nombre.isNotEmpty
+                ? '¡Bienvenida $nombre!'
+                : '¡Inicio de sesión exitoso!',
+          ),
+        ),
       );
+
+      // Navega al Home
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+    } catch (e) {
+      // Extrae el mensaje sin el prefijo "Exception: "
+      _showErrorMessage(e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _isLoadingEmail = false);
     }
   }
 
