@@ -512,63 +512,6 @@ class _HomeScreenState extends State<HomeScreen>
               : [Colors.transparent, Colors.white.withValues(alpha: 0.3)],
         ),
       ),
-<<<<<<< HEAD
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Input de texto
-          Expanded(
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: isTablet ? 48 : 44,
-                maxHeight: isTablet ? 120 : 100,
-              ),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.0)
-                    : Colors.grey[100],
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.15)
-                      : Colors.grey[300]!,
-                ),
-              ),
-              child: TextField(
-                controller: _messageController,
-                focusNode: _focusNode,
-                //enabled: !isTyping, cuando se integre el chat real se descomenta
-                enabled: true,
-                style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF2f43a7),
-                  fontSize: isTablet ? 15 : 14,
-                  height: 1.4,
-                ),
-                decoration: InputDecoration(
-                  hintText: isTyping
-                      ? 'Esperando respuesta...'
-                      : 'Escribe tu mensaje...',
-                  hintStyle: TextStyle(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.5)
-                        : Colors.grey[600],
-                    fontSize: isTablet ? 15 : 14,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: isTablet ? 20 : 16,
-                    vertical: isTablet ? 14 : 12,
-                  ),
-                ),
-                maxLines: null,
-                minLines: 1,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                textCapitalization: TextCapitalization.sentences,
-                onSubmitted: isTyping ? null : (_) => _sendMessage(),
-              ),
-            ),
-=======
       child: Container(
         constraints: BoxConstraints(
           maxHeight: isLandscape
@@ -585,7 +528,6 @@ class _HomeScreenState extends State<HomeScreen>
                 ? Colors.white.withValues(alpha: 0.1)
                 : const Color(0xFF2f43a7).withValues(alpha: 0.2),
             width: 1.5,
->>>>>>> 0ca86b15eb805fa457b4805c2ff6646f3fdb0317
           ),
           boxShadow: isDark
               ? [

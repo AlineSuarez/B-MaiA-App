@@ -10,6 +10,7 @@ import '../widgets/background_gradient.dart';
 import '../services/profile_service.dart';
 import '../services/api_client.dart';
 import 'login_screen.dart';
+import 'package:dio/dio.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,12 +20,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // estado
+  // ------------------------------
+  // Estado general
+  // ------------------------------
   bool _loading = true;
 
-  // datos de perfil (todo opcional; si no hay => “—”)
+  // Datos de perfil (se muestran como “—” si faltan)
   String? _avatarUrl;
-  String? _profileImagePath; // preview local
+  String? _profileImagePath; // preview local al elegir imagen
 
   String? _nombres;
   String? _apellidos;
@@ -34,10 +37,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String? _rut;
   String? _razonSocial;
-  String? _region;
-  String? _comuna;
   String? _direccion;
   String? _sagRegistro;
+
+  // Región/Comuna: pueden venir como IDs => resolvemos nombres vía lookups
+  int? _idRegion;
+  int? _idComuna;
+  String? _regionName; // nombre ya resuelto (o provisto por API)
+  String? _comunaName;
+
+  // lookups cacheados en memoria (1 solo fetch por sesión de pantalla)
+  Map<int, String> _regionesMap = {};
+  Map<int, String> _comunasMap = {};
 
   final ImagePicker _picker = ImagePicker();
   final _profileService = ProfileService();
@@ -54,6 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _updateSystemUI();
   }
 
+  // Ajusta íconos de status/nav bar según tema actual
   void _updateSystemUI() {
     final provider = Provider.of<ThemeProvider>(context, listen: false);
     final platform = MediaQuery.of(context).platformBrightness;
@@ -77,7 +89,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // -------- API: /user (via ProfileService/ApiClient) --------
+  // ------------------------------
+  // Carga /user y aplica datos
+  // ------------------------------
   Future<void> _fetchMe() async {
     try {
       final map = Map<String, dynamic>.from(await _profileService.me());
@@ -86,6 +100,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : map;
 
       _applyMe(data);
+
+      // Si hay IDs de región/comuna pero no nombres, los resolvemos una vez
+      await _resolveRegionComunaNames();
+
       if (mounted) setState(() => _loading = false);
     } catch (e) {
       if (!mounted) return;
@@ -94,33 +112,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // Toma el map del backend y llena el estado de la UI
   void _applyMe(Map<String, dynamic> m) {
     setState(() {
+      // Básicos
       _nombres = m['name']?.toString();
       _apellidos = m['last_name']?.toString();
       _correo = m['email']?.toString();
       _telefono = (m['telefono'] ?? m['phone'])?.toString();
+
+      // Fecha de creación / membresía
       _memberSince = (m['created_at'] ?? m['member_since'])?.toString();
 
+      // Legales
       _rut = m['rut']?.toString();
       _razonSocial = m['razon_social']?.toString();
       _sagRegistro = (m['numero_registro'] ?? m['sag_registro'])?.toString();
 
-      final idRegion = m['id_region'];
-      final idComuna = m['id_comuna'];
-      _region = (idRegion == null) ? null : 'ID región: $idRegion';
-      _comuna = (idComuna == null) ? null : 'ID comuna: $idComuna';
+      // Ubicación: ids y posibles nombres embebidos
+      _idRegion = (m['id_region'] as num?)?.toInt();
+      _idComuna = (m['id_comuna'] as num?)?.toInt();
 
-      _direccion = m['direccion']?.toString();
+      final region = m['region'];
+      if (region is Map) _regionName = region['name']?.toString();
+      if (region is String) _regionName = region;
 
+      final comuna = m['comuna'];
+      if (comuna is Map) _comunaName = comuna['name']?.toString();
+      if (comuna is String) _comunaName = comuna;
+
+      _direccion = (m['direccion'] ?? m['address'])?.toString();
+
+      // Avatar: puede venir relativo => construimos URL absoluta
       final pp = (m['profile_picture'] ?? m['avatar_url'])?.toString();
       _avatarUrl = _resolveUrl(pp);
     });
   }
 
+  // Si solo tenemos IDs, pegamos a /regiones y /comunas y mapeamos nombres
+  Future<void> _resolveRegionComunaNames() async {
+    try {
+      final dio = ApiClient().dio;
+
+      if (_regionName == null && _idRegion != null) {
+        await _loadLookupsIfNeeded(dio);
+        _regionName = _regionesMap[_idRegion!];
+      }
+      if (_comunaName == null && _idComuna != null) {
+        await _loadLookupsIfNeeded(dio);
+        _comunaName = _comunasMap[_idComuna!];
+      }
+      if (mounted) setState(() {});
+    } catch (_) {
+      // Silenciar: si no existen endpoints, dejamos IDs sin resolver.
+      // No mostramos snackbar para no molestar a la usuaria.
+    }
+  }
+
+  Future<void> _loadLookupsIfNeeded(Dio dio) async {
+    if (_regionesMap.isEmpty) {
+      try {
+        final r = await dio.get('/regiones');
+        final list = (r.data is Map && r.data['data'] is List)
+            ? List<Map<String, dynamic>>.from(r.data['data'])
+            : List<Map<String, dynamic>>.from(r.data as List);
+        _regionesMap = {
+          for (final e in list)
+            (e['id'] as num).toInt(): (e['name'] ?? e['nombre'] ?? '')
+                .toString(),
+        };
+      } catch (_) {
+        /* ignorar */
+      }
+    }
+
+    if (_comunasMap.isEmpty) {
+      try {
+        final r = await dio.get('/comunas');
+        final list = (r.data is Map && r.data['data'] is List)
+            ? List<Map<String, dynamic>>.from(r.data['data'])
+            : List<Map<String, dynamic>>.from(r.data as List);
+        _comunasMap = {
+          for (final e in list)
+            (e['id'] as num).toInt(): (e['name'] ?? e['nombre'] ?? '')
+                .toString(),
+        };
+      } catch (_) {
+        /* ignorar */
+      }
+    }
+  }
+
   Future<void> _pullToRefresh() => _fetchMe();
 
-  // -------- UI helpers: foto y snackbars --------
+  // ------------------------------
+  // Helpers de UI
+  // ------------------------------
   Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -253,7 +340,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // -------- BUILD --------
+  // ------------------------------
+  // BUILD
+  // ------------------------------
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ThemeProvider>(context);
@@ -375,14 +464,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildReadOnlyTile(
                           icon: Icons.map_outlined,
                           title: 'Región',
-                          value: _display(_region),
+                          value: _display(_regionName),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.location_city_outlined,
                           title: 'Comuna',
-                          value: _display(_comuna),
+                          value: _display(_comunaName),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
@@ -491,7 +580,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // -------- Widgets de UI --------
+  // ------------------------------
+  // Widgets de UI
+  // ------------------------------
   Widget _buildProfileHeader(bool isDark, bool isTablet) {
     final nameForHeader = _display(_nombres);
     final emailForHeader = _display(_correo);
@@ -847,7 +938,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             _buildInfoRow(
               'Miembro desde',
-              _display(_memberSince),
+              _formatDateDMY(_memberSince),
               Icons.calendar_today_rounded,
               isDark,
               isTablet,
@@ -860,7 +951,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             _buildInfoRow(
               'ID de usuario',
-              '—', // Mapea y muestra si tu /user trae 'id'
+              '—', // muestra si tu /user trae 'id'
               Icons.fingerprint_rounded,
               isDark,
               isTablet,
@@ -947,21 +1038,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // util: “—” si vacío
+  // “—” si vacío
   String _display(String? v) =>
       (v == null || v.trim().isEmpty) ? '—' : v.trim();
 
-  // Resolver URL absoluta de imagen de perfil (si viene relativa)
+  // Formatea ISO / "YYYY-MM-DD HH:mm:ss" a DD-MM-YYYY
+  String _formatDateDMY(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return '—';
+    DateTime? dt = DateTime.tryParse(raw);
+    dt ??= DateTime.tryParse(raw.replaceAll(' ', 'T'));
+    if (dt == null) return '—';
+    final dd = dt.day.toString().padLeft(2, '0');
+    final mm = dt.month.toString().padLeft(2, '0');
+    final yyyy = dt.year.toString();
+    return '$dd-$mm-$yyyy';
+  }
+
+  // Convierte rutas relativas de imagen en URL absoluta según ApiClient.origin
   String? _resolveUrl(String? path) {
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
-
     final origin = ApiClient.origin;
     final cleaned = path.startsWith('/') ? path.substring(1) : path;
+    // Evita dobles barras, mantiene el esquema
     return '$origin/$cleaned'.replaceAll('//', '/').replaceFirst(':/', '://');
   }
 
-  // diálogos (logout / eliminar)
+  // ------------------------------
+  // Diálogos (logout / eliminar)
+  // ------------------------------
   void _showLogoutDialog(bool isDark) {
     showDialog(
       context: context,
@@ -1006,12 +1111,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              // Capturamos el Navigator antes del async gap
+              // Captura el navigator antes del gap async
               final navigator = Navigator.of(context);
-              // Cerramos el diálogo
-              navigator.pop();
+              navigator.pop(); // cierra el diálogo
 
-              // Limpieza local
+              // Limpia sesión local y token
               final prefs = await SharedPreferences.getInstance();
               await prefs.remove('me');
               await prefs.setBool('isLoggedIn', false);
@@ -1019,9 +1123,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               await prefs.remove('loginMethod');
               await ApiClient().clearToken();
 
-              // Usamos el navigator capturado (no el context)
+              // Navega a Login sin usar context tras async gap
               navigator.pushAndRemoveUntil(
-                MaterialPageRoute(builder: (ctx) => const LoginScreen()),
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
                 (route) => false,
               );
             },

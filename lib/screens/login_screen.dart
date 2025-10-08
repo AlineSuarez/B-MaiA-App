@@ -6,6 +6,7 @@ import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 import '../widgets/custom_text_field.dart';
 import '../services/auth_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,6 +22,11 @@ class _LoginScreenState extends State<LoginScreen>
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final _auth = AuthService();
+  final GoogleSignIn _gsi = GoogleSignIn(
+    serverClientId:
+        '32045614003-h4vnlp4qqa1bb7atade1ifgn08v10oip.apps.googleusercontent.com',
+    scopes: <String>['email', 'profile'],
+  );
 
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -87,18 +93,22 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() => _isLoadingEmail = true);
 
     try {
-      // Llama al backend: POST /api/v1/login
+      // 1) Login (AuthService guarda el token en ApiClient)
       final data = await _auth.login(email: email, password: pass);
-      // data deberia traer { token:"...", user:{ id, name, email } }
 
-      // Guarda estado de sesión mínimo para tu app
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('userEmail', data['user']?['email'] ?? email);
+      // 2) (Opcional) traer perfil y cachearlo para otras pantallas
+      try {
+        final me = await _auth.me(); // GET /user con el token recién guardado
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('me', me.toString()); // o jsonEncode(me)
+        await prefs.setString('userEmail', data['user']?['email'] ?? email);
+      } catch (_) {
+        // Si falla /user no es crítico: ya tenemos token válido
+      }
 
       if (!mounted) return;
 
-      // Mensaje de bienvenida visible
+      // 3) Mensaje de bienvenida
       final nombre = (data['user']?['name'] ?? '').toString();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -110,12 +120,11 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       );
 
-      // Navega al Home
+      // 4) Ir al Home
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
     } catch (e) {
-      // Extrae el mensaje sin el prefijo "Exception: "
       _showErrorMessage(e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isLoadingEmail = false);
@@ -123,23 +132,53 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleGoogleLogin() async {
-    setState(() {
-      _isLoadingGoogle = true;
-    });
-    await Future.delayed(const Duration(seconds: 2));
+    setState(() => _isLoadingGoogle = true);
 
-    // Guardar estado de sesión
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-    await prefs.setString('loginMethod', 'google');
+    try {
+      // 1) Selector de cuenta
+      final GoogleSignInAccount? account = await _gsi.signIn();
+      if (account == null) {
+        // usuario canceló
+        setState(() => _isLoadingGoogle = false);
+        return;
+      }
 
-    setState(() {
-      _isLoadingGoogle = false;
-    });
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      // 2) Tokens de Google
+      final GoogleSignInAuthentication auth = await account.authentication;
+      final String? idToken = auth.idToken;
+      if (idToken == null) throw Exception('No se recibió id_token de Google');
+
+      // 3) Login en tu API con el id_token
+      final data = await _auth.loginWithGoogle(idToken: idToken);
+
+      // 4) (opcional) cachear /user
+      try {
+        final me = await _auth.me();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('me', me.toString());
+        await prefs.setString('userEmail', data['user']?['email'] ?? '');
+      } catch (_) {}
+
+      // 5) (opcional) marcar bandera local
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('loginMethod', 'google');
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('¡Inicio con Google exitoso!')),
       );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+    } catch (e) {
+      _showErrorMessage(e.toString().replaceFirst('Exception: ', ''));
+      // limpia sesión parcial de Google si algo falló
+      try {
+        await _gsi.signOut();
+      } catch (_) {}
+    } finally {
+      if (mounted) setState(() => _isLoadingGoogle = false);
     }
   }
 

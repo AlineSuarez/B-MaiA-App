@@ -78,6 +78,32 @@ class AuthService {
     }
   }
 
+  // login con Google
+  Future<Map<String, dynamic>> loginWithGoogle({
+    required String idToken,
+    String device = 'flutter-app',
+  }) async {
+    try {
+      final res = await _api.dio.post(
+        '/login/google',
+        data: {'id_token': idToken, 'device': device},
+      );
+
+      final data = Map<String, dynamic>.from(res.data);
+      final token = data['token'] as String?;
+      if (token == null) throw Exception('Respuesta inválida del servidor');
+
+      await _api.saveToken(token); // guarda el Bearer
+      return data;
+    } on DioException catch (e) {
+      final body = e.response?.data;
+      final serverMsg = body is Map ? (body['message']?.toString()) : null;
+      throw Exception(serverMsg ?? 'No se pudo iniciar sesión con Google');
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
   /// Perfil básico autenticado
   Future<Map<String, dynamic>> me() async {
     final res = await _api.dio.get('/user'); // /api/v1/user
@@ -89,5 +115,41 @@ class AuthService {
       await _api.dio.post('/logout');
     } catch (_) {}
     await _api.clearToken();
+  }
+
+  Future<void> requestPasswordReset(String email) async {
+    try {
+      await _api.dio.post('/password/forgot', data: {'email': email});
+    } on DioException catch (e) {
+      final body = e.response?.data;
+      if (body is Map && body['message'] != null) {
+        throw Exception(body['message'].toString());
+      }
+      throw Exception('No se pudo enviar el correo de recuperación');
+    }
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+  }) async {
+    try {
+      await _api.dio.post(
+        '/password/reset',
+        data: {
+          'email': email,
+          'token': token,
+          'password': newPassword,
+          'password_confirmation': newPassword,
+        },
+      );
+    } on DioException catch (e) {
+      final body = e.response?.data;
+      if (body is Map && body['message'] != null) {
+        throw Exception(body['message'].toString());
+      }
+      throw Exception('No se pudo restablecer la contraseña');
+    }
   }
 }
