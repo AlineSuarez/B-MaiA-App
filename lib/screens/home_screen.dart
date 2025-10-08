@@ -193,9 +193,6 @@ class _HomeScreenState extends State<HomeScreen>
             child: Container(
               padding: EdgeInsets.all(isTablet ? 12 : 10),
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : const Color(0xFF2f43a7).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
               ),
               child: Icon(
@@ -488,24 +485,34 @@ class _HomeScreenState extends State<HomeScreen>
     bool isDark,
     bool isTyping,
   ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final orientation = MediaQuery.of(context).orientation;
+    final isLandscape = orientation == Orientation.landscape;
+    final hasText = _messageController.text.trim().isNotEmpty;
+
     return Container(
       padding: EdgeInsets.fromLTRB(
-        isTablet ? 20 : 16,
-        isTablet ? 12 : 8,
-        isTablet ? 20 : 16,
-        (isTablet ? 16 : 12) + (keyboardHeight > 0 ? 4 : 0),
+        screenWidth * (isLandscape ? 0.03 : 0.04),
+        isLandscape ? (isTablet ? 8 : 6) : (isTablet ? 16 : 12),
+        screenWidth * (isLandscape ? 0.03 : 0.04),
+        isLandscape
+            ? (isTablet ? 10 : 8) + (keyboardHeight > 0 ? 6 : 0)
+            : (isTablet ? 20 : 16) + (keyboardHeight > 0 ? 8 : 0),
       ),
       decoration: BoxDecoration(
-        color: Colors.transparent, // Cambiado a transparente
-        border: Border(
-          top: BorderSide(
-            color: isDark
-                ? const Color.fromARGB(0, 255, 255, 255).withValues(alpha: 0)
-                : const Color.fromARGB(0, 158, 158, 158).withValues(alpha: 0),
-            width: 1,
-          ),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? [
+                  Colors.transparent,
+                  const Color(0xFF1b1f37).withValues(alpha: 0.3),
+                ]
+              : [Colors.transparent, Colors.white.withValues(alpha: 0.3)],
         ),
       ),
+<<<<<<< HEAD
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -561,40 +568,241 @@ class _HomeScreenState extends State<HomeScreen>
                 onSubmitted: isTyping ? null : (_) => _sendMessage(),
               ),
             ),
+=======
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: isLandscape
+              ? (screenHeight * 0.35)
+              : (isTablet ? 150 : 120),
+        ),
+        decoration: BoxDecoration(
+          color: isDark
+              ? const Color(0xFF23234A).withValues(alpha: 0.6)
+              : Colors.white.withValues(alpha: 0.95),
+          borderRadius: BorderRadius.circular(isLandscape ? 20 : 26),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : const Color(0xFF2f43a7).withValues(alpha: 0.2),
+            width: 1.5,
+>>>>>>> 0ca86b15eb805fa457b4805c2ff6646f3fdb0317
           ),
-
-          SizedBox(width: isTablet ? 12 : 10),
-
-          // Botón de enviar
-          GestureDetector(
-            onTap: isTyping ? null : _sendMessage,
-            child: AnimatedOpacity(
-              opacity: isTyping ? 0.5 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: Container(
-                padding: EdgeInsets.all(isTablet ? 14 : 12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2f43a7), Color(0xFF4a5bb8)],
+          boxShadow: isDark
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                    spreadRadius: 0,
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2f43a7).withValues(alpha: 0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                    spreadRadius: 0,
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: const Color(0xFF2f43a7).withValues(alpha: 0.06),
+                    blurRadius: 15,
+                    offset: const Offset(0, 2),
+                    spreadRadius: 0,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    blurRadius: 8,
+                    offset: const Offset(0, -1),
+                    spreadRadius: 0,
+                  ),
+                ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Botón de clip para adjuntar
+            Padding(
+              padding: EdgeInsets.only(
+                left: isLandscape ? (isTablet ? 8 : 6) : (isTablet ? 10 : 8),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: isTyping
+                      ? null
+                      : () {
+                          HapticFeedback.lightImpact();
+                        },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: EdgeInsets.all(
+                      isLandscape ? (isTablet ? 7 : 6) : (isTablet ? 9 : 7),
                     ),
-                  ],
-                ),
-                child: Icon(
-                  isTyping ? Icons.hourglass_empty_rounded : Icons.send_rounded,
-                  color: Colors.white,
-                  size: isTablet ? 22 : 20,
+                    child: Icon(
+                      Icons.attach_file_rounded,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: isTyping ? 0.3 : 0.6)
+                          : const Color(
+                              0xFF2f43a7,
+                            ).withValues(alpha: isTyping ? 0.3 : 0.7),
+                      size: isLandscape
+                          ? (isTablet ? 18 : 16)
+                          : (isTablet ? 22 : 20),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+
+            // Input de texto
+            Expanded(
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: isLandscape
+                      ? (isTablet ? 36 : 32)
+                      : (isTablet ? 44 : 40),
+                  maxHeight: isLandscape
+                      ? (screenHeight * 0.3)
+                      : (isTablet ? 110 : 90),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isLandscape
+                      ? (isTablet ? 3 : 2)
+                      : (isTablet ? 4 : 2),
+                  vertical: isLandscape
+                      ? (isTablet ? 2 : 1)
+                      : (isTablet ? 4 : 2),
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  focusNode: _focusNode,
+                  enabled: !isTyping,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF1a2a5e),
+                    fontSize: isLandscape
+                        ? (isTablet ? 13 : 12)
+                        : (isTablet ? 15 : 14),
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: isTyping
+                        ? 'B-MaiA está escribiendo...'
+                        : 'Escribe tu mensaje aquí...',
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : const Color.fromARGB(
+                              255,
+                              23,
+                              34,
+                              90,
+                            ).withValues(alpha: 0.6),
+                      fontSize: isLandscape
+                          ? (isTablet ? 13 : 12)
+                          : (isTablet ? 15 : 14),
+                      fontWeight: FontWeight.w400,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: isLandscape
+                          ? (isTablet ? 8 : 6)
+                          : (isTablet ? 10 : 8),
+                      vertical: isLandscape
+                          ? (isTablet ? 8 : 6)
+                          : (isTablet ? 12 : 10),
+                    ),
+                    isDense: true,
+                  ),
+                  maxLines: null,
+                  minLines: 1,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  textCapitalization: TextCapitalization.sentences,
+                  onChanged: (value) {
+                    setState(() {
+                      // Actualiza el estado para habilitar/deshabilitar el botón
+                    });
+                  },
+                  onSubmitted: (isTyping || !hasText)
+                      ? null
+                      : (_) => _sendMessage(),
+                ),
+              ),
+            ),
+
+            // Botón de enviar
+            Padding(
+              padding: EdgeInsets.only(
+                right: isLandscape ? (isTablet ? 4 : 3) : (isTablet ? 5 : 4),
+                left: isLandscape ? (isTablet ? 4 : 3) : (isTablet ? 5 : 4),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: (!isTyping && hasText)
+                      ? () {
+                          HapticFeedback.mediumImpact();
+                          _sendMessage();
+                        }
+                      : null,
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: (!isTyping && hasText)
+                            ? [const Color(0xFF2f43a7), const Color(0xFF4a5bb8)]
+                            : isDark
+                            ? [
+                                const Color(0xFF2f43a7).withValues(alpha: 0.3),
+                                const Color(0xFF4a5bb8).withValues(alpha: 0.3),
+                              ]
+                            : [
+                                const Color(0xFF2f43a7).withValues(alpha: 0.25),
+                                const Color(0xFF4a5bb8).withValues(alpha: 0.25),
+                              ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: EdgeInsets.all(
+                      isLandscape ? (isTablet ? 8 : 7) : (isTablet ? 10 : 8),
+                    ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder: (child, animation) {
+                        return RotationTransition(
+                          turns: animation,
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        isTyping
+                            ? Icons.hourglass_empty_rounded
+                            : Icons.arrow_upward_rounded,
+                        key: ValueKey(isTyping),
+                        color: (!isTyping && hasText)
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.6),
+                        size: isLandscape
+                            ? (isTablet ? 16 : 14)
+                            : (isTablet ? 20 : 18),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
