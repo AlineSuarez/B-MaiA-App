@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String kApiBase = 'http://10.0.2.2:8000/api/v1';
+const String kApiBase = 'https://www.bmaia.cl/api/v1';
 
 class ApiClient {
   ApiClient._internal() {
@@ -30,7 +30,7 @@ class ApiClient {
   late final Dio dio;
 
   static const _tokenKey = 'authToken';
-  static const origin = 'http://10.0.2.2:8000';
+  static const origin = 'https://www.bmaia.cl';
 
   Future<void> saveToken(String token) async {
     final p = await SharedPreferences.getInstance();

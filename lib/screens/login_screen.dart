@@ -165,9 +165,9 @@ class _LoginScreenState extends State<LoginScreen>
       await prefs.setString('loginMethod', 'google');
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Inicio con Google exitoso!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('¡Bienvenido!')));
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));

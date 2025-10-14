@@ -1,8 +1,7 @@
 class ApiConfig {
-  // Puedes sobreescribir con --dart-define=API_BASE=https://tuapp.com/api
   static const String baseUrl = String.fromEnvironment(
     'API_BASE',
-    defaultValue: 'http://127.0.0.1:8000/api',
+    defaultValue: 'https://www.bmaia.cl/api',
   );
 
   // Paths frecuentes por si quieres reusar en otras pantallas
