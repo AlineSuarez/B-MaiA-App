@@ -1,10 +1,12 @@
 import '../models/region_lite.dart';
 import '../models/comuna_lite.dart';
 import 'json_store.dart';
+import '../offline/cache_dao.dart';
 
 class CacheRepository {
   final _regions = JsonStore('regions.json');
   final _comunas = JsonStore('comunas.json');
+  final CacheDao _dao = CacheDao();
 
   Future<void> saveRegions(List<RegionLite> list) async {
     await _regions.write({'items': list.map((e) => e.toJson()).toList()});
@@ -28,5 +30,13 @@ class CacheRepository {
     return raw
         .map((e) => ComunaLite.fromJson(Map<String, dynamic>.from(e as Map)))
         .toList();
+  }
+
+  Future<List<Map<String, Object?>>> colmenasDeApiario(int apiarioId) {
+    return _dao.colmenasDeApiario(apiarioId);
+  }
+
+  Future<Map<String, Object?>?> buscarColmenaPorQR(String qr) {
+    return _dao.buscarColmenaPorQR(qr);
   }
 }

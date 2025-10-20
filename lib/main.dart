@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'providers/theme_provider.dart';
 import 'providers/chat_provider.dart';
+import 'providers/voice_provider.dart'; // <-- AÑADIDO
+
 import 'screens/onboarding_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+
 import 'services/api_client.dart';
 import 'services/auth_service.dart';
 
@@ -36,10 +40,8 @@ class MyApp extends StatelessWidget {
     // 3) hay token -> validamos contra /user
     try {
       await AuthService().me(); // 200 OK => token válido
-      // opcional: await prefs.setBool('isLoggedIn', true);
       return const HomeScreen();
     } catch (_) {
-      // token inválido / expirado -> limpiamos y vamos a login
       await ApiClient().clearToken();
       await prefs.setBool('isLoggedIn', false);
       return const LoginScreen();
@@ -48,10 +50,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Instancia que usaremos también en VoiceProvider
+    final apiClient = ApiClient();
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(
+          create: (_) => VoiceProvider(apiClient: apiClient), // <-- AÑADIDO
+        ),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

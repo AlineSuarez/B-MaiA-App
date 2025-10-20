@@ -47,4 +47,25 @@ class PendingJob {
     ),
     lastError: m['lastError'],
   );
+
+  factory PendingJob.create({
+    required String method,
+    required String endpoint,
+    required Map<String, dynamic> payload,
+    Map<String, String>? headers,
+    String? id,
+    DateTime? createdAt,
+  }) {
+    return PendingJob(
+      id: id ?? DateTime.now().microsecondsSinceEpoch.toString(),
+      endpoint: endpoint,
+      method: method.toUpperCase(),
+      headers: headers ?? <String, String>{},
+      payload: payload,
+      createdAt: createdAt ?? DateTime.now(),
+      retries: 0,
+      status: JobStatus.queued,
+      lastError: null,
+    );
+  }
 }

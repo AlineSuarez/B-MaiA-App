@@ -236,4 +236,23 @@ Por favor, cuéntame más sobre lo que necesitas y estaré encantado de asistirt
       'Profundiza en este tema',
     ];
   }
+
+  /// Wrapper para compatibilidad con AssistantProvider.
+  /// Convierte el stream de generateResponse(...) en un único String y lo entrega como Map.
+  Future<Map<String, dynamic>> answerFromDocs(String userMessage) async {
+    final buffer = StringBuffer();
+    await for (final chunk in generateResponse(userMessage)) {
+      // generateResponse ya va “streameando” el texto; aquí acumulamos el final
+      buffer
+        ..clear()
+        ..write(
+          chunk,
+        ); // chunk ya contiene el texto completo acumulado en tu implementación
+    }
+    return {
+      'ok': true,
+      'text': buffer.toString(),
+      'source': 'AIService.generateResponse',
+    };
+  }
 }

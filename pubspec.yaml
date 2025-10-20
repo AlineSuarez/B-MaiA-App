@@ -21,9 +21,17 @@ dependencies:
   characters: ^1.4.0
   lints: ^6.0.0
   flutter_markdown: ^0.7.4+1
-  dio: ^5.4.0
+  dio: ^5.9.0
   flutter_secure_storage: ^9.0.0
   google_sign_in: ^6.2.1
+  uuid: ^4.5.1
+  flutter_tts: ^4.2.3
+  connectivity_plus: ^7.0.0
+  speech_to_text: ^7.3.0
+  path_provider: ^2.1.5
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  
 
 dev_dependencies:
   flutter_test:

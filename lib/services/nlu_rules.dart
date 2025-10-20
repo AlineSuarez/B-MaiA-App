@@ -1,44 +1,76 @@
-import 'text_norm.dart';
-
-class IntentResult {
-  final String intent; // 'crear_apiario' | 'consulta_apiarios' | 'otro'
-  final Map<String, String> slots; // nombre, region, comuna
-  IntentResult(this.intent, this.slots);
-}
+String _norm(String s) => s
+    .toLowerCase()
+    .replaceAll(RegExp(r'[áàä]'), 'a')
+    .replaceAll(RegExp(r'[éèë]'), 'e')
+    .replaceAll(RegExp(r'[íìï]'), 'i')
+    .replaceAll(RegExp(r'[óòö]'), 'o')
+    .replaceAll(RegExp(r'[úùü]'), 'u');
 
 class NluRules {
-  static IntentResult detect(String text) {
-    final t = norm(text);
+  /// Debe existir este método (lo llama AssistantProvider)
+  Future<Map<String, dynamic>> parse(
+    String text, {
+    Map<String, dynamic>? meta,
+  }) async {
+    final t = _norm(text);
+    final slots = {...(meta ?? {})};
 
-    if (t.contains('crear apiario')) {
-      String nombre = '';
-      final mNom = RegExp(
-        r'(llamado|nombre)\\s+([a-z0-9\\s\\-]+)',
-      ).firstMatch(t);
-      if (mNom != null) nombre = mNom.group(2)!.trim();
-      if (nombre.isEmpty) {
-        final m2 = RegExp(
-          r'crear apiario\\s+([^,]+?)(?=\\s+en\\s+|$|,)',
-        ).firstMatch(t);
-        if (m2 != null) nombre = m2.group(1)!.trim();
-      }
-      final region =
-          RegExp(r'region\\s+([a-z\\s\\-]+)').firstMatch(t)?.group(1)?.trim() ??
-          '';
-      final comuna =
-          RegExp(r'comuna\\s+([a-z\\s\\-]+)').firstMatch(t)?.group(1)?.trim() ??
-          '';
-      return IntentResult('crear_apiario', {
-        'nombre': nombre,
-        'region': region,
-        'comuna': comuna,
-      });
+    // DEMO 1: visita inspección
+    if (t.contains('crear') && t.contains('visita') && t.contains('inspe')) {
+      final required = [
+        'apiario_id',
+        'fecha_visita',
+        'num_colmenas_inspeccionadas',
+      ];
+      slots['fecha_visita'] ??= DateTime.now().toIso8601String().substring(
+        0,
+        10,
+      );
+      final missing = required
+          .where((k) => slots[k] == null || slots[k].toString().isEmpty)
+          .toList();
+      return {
+        'tipo': 'cmd',
+        'intent': 'crear_visita_inspeccion',
+        'slots': slots,
+        'required': required,
+        'missing': missing,
+        'prompt': missing.isNotEmpty ? _prompt(missing.first) : null,
+        'offline_allowed': true,
+        'endpoint': {'method': 'POST', 'path': '/api/v1/visitas/inspeccion'},
+        'needs_online': false,
+        'cache_ok_offline': false,
+      };
     }
 
-    if (t.contains('cuantos apiarios') || t.contains('cantidad de apiarios')) {
-      return IntentResult('consulta_apiarios', {});
-    }
+    // DEMO 2: por defecto listar colmenas de un apiario
+    final required = ['apiario_id'];
+    final missing = required
+        .where((k) => slots[k] == null || slots[k].toString().isEmpty)
+        .toList();
+    return {
+      'tipo': 'query',
+      'intent': 'listar_colmenas_apiario',
+      'slots': slots,
+      'required': required,
+      'missing': missing,
+      'prompt': missing.isNotEmpty ? _prompt(missing.first) : null,
+      'offline_allowed': true,
+      'endpoint': null,
+      'needs_online': false,
+      'cache_ok_offline': true,
+    };
+  }
 
-    return IntentResult('otro', {});
+  String _prompt(String key) {
+    switch (key) {
+      case 'apiario_id':
+        return '¿ID del apiario?';
+      case 'fecha_visita':
+        return '¿Fecha de la visita?';
+      case 'num_colmenas_inspeccionadas':
+        return '¿Cuántas colmenas inspeccionaste?';
+    }
+    return 'Me falta $key, ¿cuál es?';
   }
 }

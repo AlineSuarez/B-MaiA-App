@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/theme_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/background_gradient.dart';
 import '../widgets/custom_drawer.dart';
 import '../widgets/chat/chat_list.dart';
-import '../screens/onboarding_screen.dart';
+import '../screens/voice_demo_screen.dart';
+
+// 👇 añade estos imports
+import '../services/api_client.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -250,7 +254,34 @@ class _HomeScreenState extends State<HomeScreen>
               },
             ),
 
-          // Botón para abrir Onboarding
+          // Botón para abrir B-Maia por voz
+          IconButton(
+            icon: Icon(
+              Icons.mic_none_rounded,
+              color: isDark ? Colors.white : const Color(0xFF2f43a7),
+              size: isTablet ? 24 : 22,
+            ),
+            tooltip: 'Hablar con B-Maia',
+            onPressed: () {
+              final apiClient = ApiClient();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => VoiceDemoScreen(
+                    baseUrl: apiClient.dio.options.baseUrl,
+                    // toma el bearer actual del header (si está), o devuelve ''.
+                    getToken: () async =>
+                        apiClient.dio.options.headers['Authorization']
+                            ?.toString()
+                            .replaceFirst('Bearer ', '') ??
+                        '',
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Botón “info” (ahora también abre la pantalla de voz con args correctos)
           IconButton(
             icon: Icon(
               Icons.info_outline_rounded,
@@ -259,9 +290,19 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             tooltip: 'Ver introducción',
             onPressed: () {
-              Navigator.of(context).push(
+              final apiClient = ApiClient();
+              Navigator.push(
+                context,
                 MaterialPageRoute(
-                  builder: (context) => const OnboardingScreen(),
+                  builder: (_) => VoiceDemoScreen(
+                    baseUrl: apiClient.dio.options.baseUrl,
+                    // toma el bearer actual del header (si está), o devuelve ''.
+                    getToken: () async =>
+                        apiClient.dio.options.headers['Authorization']
+                            ?.toString()
+                            .replaceFirst('Bearer ', '') ??
+                        '',
+                  ),
                 ),
               );
             },
@@ -325,18 +366,11 @@ class _HomeScreenState extends State<HomeScreen>
             // Icono principal
             Container(
               padding: EdgeInsets.all(isTablet ? 24 : 20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
                   colors: [Color(0xFF2f43a7), Color(0xFF4a5bb8)],
                 ),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF2f43a7).withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
               child: Icon(
                 Icons.auto_awesome,
@@ -666,9 +700,9 @@ class _HomeScreenState extends State<HomeScreen>
                       // Actualiza el estado para habilitar/deshabilitar el botón
                     });
                   },
-                  onSubmitted: (isTyping || !hasText)
-                      ? null
-                      : (_) => _sendMessage(),
+                  onSubmitted: (!isTyping && hasText)
+                      ? (_) => _sendMessage()
+                      : null,
                 ),
               ),
             ),
