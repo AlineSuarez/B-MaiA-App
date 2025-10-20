@@ -1,0 +1,1046 @@
+{
+  "@@locale": "es",
+  "appName": "B-MaiA",
+  "@appName": {
+    "description": "Nombre de la aplicación"
+  },
+  "loading": "Cargando...",
+  "@loading": {
+    "description": "Texto del indicador de carga"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Etiqueta genérica de error"
+  },
+  "success": "Éxito",
+  "@success": {
+    "description": "Mensaje genérico de éxito"
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Etiqueta del botón cancelar"
+  },
+  "accept": "Aceptar",
+  "@accept": {
+    "description": "Etiqueta del botón aceptar"
+  },
+  "save": "Guardar",
+  "@save": {
+    "description": "Etiqueta del botón guardar"
+  },
+  "delete": "Eliminar",
+  "@delete": {
+    "description": "Etiqueta del botón eliminar"
+  },
+  "edit": "Editar",
+  "@edit": {
+    "description": "Etiqueta del botón editar"
+  },
+  "back": "Volver",
+  "@back": {
+    "description": "Etiqueta del botón volver"
+  },
+  "next": "Siguiente",
+  "@next": {
+    "description": "Etiqueta del botón siguiente"
+  },
+  "previous": "Anterior",
+  "@previous": {
+    "description": "Etiqueta del botón anterior"
+  },
+  "finish": "Finalizar",
+  "@finish": {
+    "description": "Etiqueta del botón finalizar"
+  },
+  "skip": "Omitir",
+  "@skip": {
+    "description": "Etiqueta del botón omitir"
+  },
+  "retry": "Reintentar",
+  "@retry": {
+    "description": "Etiqueta del botón reintentar"
+  },
+  "close": "Cerrar",
+  "@close": {
+    "description": "Etiqueta del botón cerrar"
+  },
+  "search": "Buscar",
+  "@search": {
+    "description": "Placeholder del campo de búsqueda"
+  },
+  "filter": "Filtrar",
+  "@filter": {
+    "description": "Etiqueta del botón filtrar"
+  },
+  "sort": "Ordenar",
+  "@sort": {
+    "description": "Etiqueta del botón ordenar"
+  },
+  "more": "Más",
+  "@more": {
+    "description": "Etiqueta de más opciones"
+  },
+  "less": "Menos",
+  "@less": {
+    "description": "Etiqueta de menos opciones"
+  },
+  "yes": "Sí",
+  "@yes": {
+    "description": "Etiqueta de confirmación sí"
+  },
+  "no": "No",
+  "@no": {
+    "description": "Etiqueta de confirmación no"
+  },
+  "welcome": "Bienvenido",
+  "@welcome": {
+    "description": "Mensaje de bienvenida general"
+  },
+  "welcomeUser": "Bienvenido, {name}",
+  "@welcomeUser": {
+    "description": "Mensaje de bienvenida personalizado",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "María"
+      }
+    }
+  },
+  "welcomeBack": "¡Bienvenida {name}!",
+  "@welcomeBack": {
+    "description": "Mensaje de bienvenida de regreso",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "María"
+      }
+    }
+  },
+  "signInToContinue": "Inicia sesión para continuar con B-MaiA",
+  "@signInToContinue": {
+    "description": "Subtítulo del mensaje de inicio de sesión"
+  },
+  "login": "Iniciar sesión",
+  "@login": {
+    "description": "Etiqueta del botón de inicio de sesión"
+  },
+  "loginSuccess": "¡Inicio de sesión exitoso!",
+  "@loginSuccess": {
+    "description": "Mensaje de éxito al iniciar sesión"
+  },
+  "logout": "Cerrar sesión",
+  "@logout": {
+    "description": "Etiqueta del botón cerrar sesión"
+  },
+  "logoutConfirm": "¿Estás seguro de que deseas cerrar sesión?",
+  "@logoutConfirm": {
+    "description": "Mensaje de confirmación de cierre de sesión"
+  },
+  "register": "Regístrate",
+  "@register": {
+    "description": "Etiqueta del botón de registro"
+  },
+  "registerNow": "Regístrate ahora",
+  "@registerNow": {
+    "description": "Llamado a la acción de registro"
+  },
+  "createAccount": "Crear Cuenta",
+  "@createAccount": {
+    "description": "Título de crear cuenta"
+  },
+  "joinBMaia": "Únete a B-MaiA y comienza tu experiencia",
+  "@joinBMaia": {
+    "description": "Subtítulo de registro"
+  },
+  "registerSuccess": "¡Registro exitoso!",
+  "@registerSuccess": {
+    "description": "Mensaje de éxito al registrarse"
+  },
+  "alreadyHaveAccount": "¿Ya tienes cuenta?",
+  "@alreadyHaveAccount": {
+    "description": "Mensaje de ya tener cuenta"
+  },
+  "noAccount": "¿No tienes cuenta?",
+  "@noAccount": {
+    "description": "Mensaje de no tener cuenta"
+  },
+  "signIn": "Iniciar sesión",
+  "@signIn": {
+    "description": "Etiqueta del enlace de iniciar sesión"
+  },
+  "signUp": "Registrarse",
+  "@signUp": {
+    "description": "Etiqueta del enlace de registrarse"
+  },
+  "email": "Correo electrónico",
+  "@email": {
+    "description": "Etiqueta del campo de correo"
+  },
+  "emailPlaceholder": "Ingresa tu correo",
+  "@emailPlaceholder": {
+    "description": "Placeholder del campo de correo"
+  },
+  "emailHint": "ejemplo@correo.com",
+  "@emailHint": {
+    "description": "Sugerencia del campo de correo"
+  },
+  "password": "Contraseña",
+  "@password": {
+    "description": "Etiqueta del campo de contraseña"
+  },
+  "passwordPlaceholder": "Ingresa tu contraseña",
+  "@passwordPlaceholder": {
+    "description": "Placeholder del campo de contraseña"
+  },
+  "confirmPassword": "Confirmar contraseña",
+  "@confirmPassword": {
+    "description": "Etiqueta del campo confirmar contraseña"
+  },
+  "confirmPasswordPlaceholder": "Confirma tu contraseña",
+  "@confirmPasswordPlaceholder": {
+    "description": "Placeholder del campo confirmar contraseña"
+  },
+  "newPassword": "Nueva contraseña",
+  "@newPassword": {
+    "description": "Etiqueta del campo nueva contraseña"
+  },
+  "currentPassword": "Contraseña actual",
+  "@currentPassword": {
+    "description": "Etiqueta del campo contraseña actual"
+  },
+  "fullName": "Nombre completo",
+  "@fullName": {
+    "description": "Etiqueta del campo nombre completo"
+  },
+  "firstName": "Nombres",
+  "@firstName": {
+    "description": "Etiqueta del campo nombres"
+  },
+  "lastName": "Apellidos",
+  "@lastName": {
+    "description": "Etiqueta del campo apellidos"
+  },
+  "phone": "Teléfono",
+  "@phone": {
+    "description": "Etiqueta del campo teléfono"
+  },
+  "address": "Dirección",
+  "@address": {
+    "description": "Etiqueta del campo dirección"
+  },
+  "region": "Región",
+  "@region": {
+    "description": "Etiqueta del campo región"
+  },
+  "commune": "Comuna",
+  "@commune": {
+    "description": "Etiqueta del campo comuna"
+  },
+  "rut": "RUT",
+  "@rut": {
+    "description": "Etiqueta del campo RUT"
+  },
+  "businessName": "Razón Social",
+  "@businessName": {
+    "description": "Etiqueta del campo razón social"
+  },
+  "sagRegistry": "N° de Registro de Apicultor/a en el SAG",
+  "@sagRegistry": {
+    "description": "Etiqueta del campo registro SAG"
+  },
+  "requiredField": "Este campo es obligatorio",
+  "@requiredField": {
+    "description": "Mensaje de validación de campo requerido"
+  },
+  "requiredFields": "Por favor, completa todos los campos",
+  "@requiredFields": {
+    "description": "Mensaje de validación de todos los campos requeridos"
+  },
+  "invalidEmail": "Ingresa un correo electrónico válido",
+  "@invalidEmail": {
+    "description": "Mensaje de validación de correo inválido"
+  },
+  "invalidEmailFormat": "Por favor, ingresa un correo electrónico válido",
+  "@invalidEmailFormat": {
+    "description": "Mensaje de validación de formato de correo inválido"
+  },
+  "passwordTooShort": "La contraseña debe tener al menos {count} caracteres",
+  "@passwordTooShort": {
+    "description": "Mensaje de validación de contraseña muy corta",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "passwordMismatch": "Las contraseñas no coinciden",
+  "@passwordMismatch": {
+    "description": "Mensaje de validación de contraseñas no coinciden"
+  },
+  "nameTooShort": "El nombre debe tener al menos {count} caracteres",
+  "@nameTooShort": {
+    "description": "Mensaje de validación de nombre muy corto",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "acceptTerms": "Debes aceptar los términos y condiciones",
+  "@acceptTerms": {
+    "description": "Mensaje de validación de aceptar términos"
+  },
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "@forgotPassword": {
+    "description": "Etiqueta del enlace de contraseña olvidada"
+  },
+  "forgotPasswordTitle": "¿Olvidaste tu contraseña?",
+  "@forgotPasswordTitle": {
+    "description": "Título de la pantalla de contraseña olvidada"
+  },
+  "forgotPasswordSubtitle": "Ingresa tu correo y te enviaremos instrucciones para recuperarla",
+  "@forgotPasswordSubtitle": {
+    "description": "Subtítulo de la pantalla de contraseña olvidada"
+  },
+  "resetPassword": "Restablecer contraseña",
+  "@resetPassword": {
+    "description": "Etiqueta del botón restablecer contraseña"
+  },
+  "sendInstructions": "Enviar Instrucciones",
+  "@sendInstructions": {
+    "description": "Etiqueta del botón enviar instrucciones"
+  },
+  "emailSent": "¡Correo Enviado!",
+  "@emailSent": {
+    "description": "Mensaje de confirmación de correo enviado"
+  },
+  "emailSentMessage": "Revisa tu correo para restablecer tu contraseña",
+  "@emailSentMessage": {
+    "description": "Mensaje detallado de correo enviado"
+  },
+  "emailSentTitle": "Revisa tu correo",
+  "@emailSentTitle": {
+    "description": "Título de la pantalla de correo enviado"
+  },
+  "checkEmailMessage": "Te hemos enviado instrucciones para restablecer tu contraseña",
+  "@checkEmailMessage": {
+    "description": "Mensaje de revisar correo"
+  },
+  "emailSentTo": "Hemos enviado un correo a:",
+  "@emailSentTo": {
+    "description": "Prefijo de correo enviado a"
+  },
+  "resendEmail": "Reenviar Correo",
+  "@resendEmail": {
+    "description": "Etiqueta del botón reenviar correo"
+  },
+  "backToLogin": "Volver al inicio de sesión",
+  "@backToLogin": {
+    "description": "Etiqueta del enlace volver al inicio de sesión"
+  },
+  "enterEmail": "Por favor ingresa tu correo",
+  "@enterEmail": {
+    "description": "Mensaje de validación de ingresar correo"
+  },
+  "continueWithGoogle": "Continuar con Google",
+  "@continueWithGoogle": {
+    "description": "Etiqueta del botón de inicio de sesión con Google"
+  },
+  "orContinueWith": "o continúa con",
+  "@orContinueWith": {
+    "description": "Separador de inicio de sesión alternativo"
+  },
+  "orRegisterWith": "o regístrate con",
+  "@orRegisterWith": {
+    "description": "Separador de registro alternativo"
+  },
+  "googleTokenError": "No se pudo obtener el token de autenticación de Google",
+  "@googleTokenError": {
+    "description": "Mensaje de error de token de Google"
+  },
+  "termsAndConditions": "términos y condiciones",
+  "@termsAndConditions": {
+    "description": "Texto del enlace de términos y condiciones"
+  },
+  "acceptTermsMessage": "Acepto los {terms}",
+  "@acceptTermsMessage": {
+    "description": "Etiqueta del checkbox de aceptar términos",
+    "placeholders": {
+      "terms": {
+        "type": "String",
+        "example": "términos y condiciones"
+      }
+    }
+  },
+  "home": "Inicio",
+  "@home": {
+    "description": "Título de la pantalla de inicio"
+  },
+  "intelligentAssistant": "Asistente inteligente",
+  "@intelligentAssistant": {
+    "description": "Etiqueta del asistente de IA"
+  },
+  "newConversation": "Nueva conversación",
+  "@newConversation": {
+    "description": "Etiqueta del botón nueva conversación"
+  },
+  "history": "Historial",
+  "@history": {
+    "description": "Etiqueta de historial"
+  },
+  "clearChat": "Limpiar chat",
+  "@clearChat": {
+    "description": "Etiqueta del botón limpiar chat"
+  },
+  "clearChatConfirm": "¿Estás seguro de que deseas eliminar todos los mensajes de esta conversación?",
+  "@clearChatConfirm": {
+    "description": "Mensaje de confirmación de limpiar chat"
+  },
+  "clear": "Limpiar",
+  "@clear": {
+    "description": "Etiqueta del botón limpiar"
+  },
+  "messageInputPlaceholder": "Escribe tu mensaje aquí...",
+  "@messageInputPlaceholder": {
+    "description": "Placeholder del campo de entrada de mensaje"
+  },
+  "typingIndicator": "B-MaiA está escribiendo...",
+  "@typingIndicator": {
+    "description": "Texto del indicador de escritura"
+  },
+  "sendMessage": "Enviar mensaje",
+  "@sendMessage": {
+    "description": "Etiqueta del botón enviar mensaje"
+  },
+  "helloBMaia": "¡Hola! Soy B-MaiA",
+  "@helloBMaia": {
+    "description": "Mensaje de saludo de la IA"
+  },
+  "aiAssistantDescription": "Tu asistente de inteligencia artificial. Pregúntame lo que necesites, estoy aquí para ayudarte.",
+  "@aiAssistantDescription": {
+    "description": "Descripción del asistente de IA"
+  },
+  "writeFirstQuestion": "Escribe tu primera pregunta",
+  "@writeFirstQuestion": {
+    "description": "Prompt de primera pregunta"
+  },
+  "trySaying": "Prueba preguntando:",
+  "@trySaying": {
+    "description": "Encabezado de sugerencias"
+  },
+  "howCanYouHelp": "¿Cómo puedes ayudarme?",
+  "@howCanYouHelp": {
+    "description": "Sugerencia 1"
+  },
+  "helpWithProgramming": "Ayúdame con programación",
+  "@helpWithProgramming": {
+    "description": "Sugerencia 2"
+  },
+  "explainConcept": "Explícame un concepto",
+  "@explainConcept": {
+    "description": "Sugerencia 3"
+  },
+  "helpMeWrite": "Ayúdame a escribir",
+  "@helpMeWrite": {
+    "description": "Sugerencia 4"
+  },
+  "settings": "Configuración",
+  "@settings": {
+    "description": "Título de la pantalla de configuración"
+  },
+  "appearance": "Apariencia",
+  "@appearance": {
+    "description": "Título de la sección de apariencia"
+  },
+  "application": "Aplicación",
+  "@application": {
+    "description": "Título de la sección de aplicación"
+  },
+  "security": "Seguridad",
+  "@security": {
+    "description": "Título de la sección de seguridad"
+  },
+  "preferences": "Preferencias",
+  "@preferences": {
+    "description": "Título de la sección de preferencias"
+  },
+  "account": "Cuenta",
+  "@account": {
+    "description": "Título de la sección de cuenta"
+  },
+  "subscription": "Suscripción",
+  "@subscription": {
+    "description": "Título de la sección de suscripción"
+  },
+  "theme": "Tema",
+  "@theme": {
+    "description": "Etiqueta de configuración de tema"
+  },
+  "themeLight": "Claro",
+  "@themeLight": {
+    "description": "Opción de tema claro"
+  },
+  "themeDark": "Oscuro",
+  "@themeDark": {
+    "description": "Opción de tema oscuro"
+  },
+  "themeSystem": "Seguir sistema",
+  "@themeSystem": {
+    "description": "Opción de tema del sistema"
+  },
+  "selectTheme": "Seleccionar tema",
+  "@selectTheme": {
+    "description": "Título del diálogo de selección de tema"
+  },
+  "systemTheme": "Sistema",
+  "@systemTheme": {
+    "description": "Etiqueta de tema del sistema"
+  },
+  "systemThemeSubtitle": "Seguir sistema",
+  "@systemThemeSubtitle": {
+    "description": "Subtítulo de tema del sistema"
+  },
+  "lightMode": "Modo claro",
+  "@lightMode": {
+    "description": "Etiqueta de modo claro"
+  },
+  "lightModeSubtitle": "Forzar modo claro",
+  "@lightModeSubtitle": {
+    "description": "Subtítulo de modo claro"
+  },
+  "darkMode": "Modo oscuro",
+  "@darkMode": {
+    "description": "Etiqueta de modo oscuro"
+  },
+  "darkModeSubtitle": "Forzar modo oscuro",
+  "@darkModeSubtitle": {
+    "description": "Subtítulo de modo oscuro"
+  },
+  "useSystemTheme": "Usar el tema del sistema operativo",
+  "@useSystemTheme": {
+    "description": "Opción de usar tema del sistema"
+  },
+  "language": "Idioma",
+  "@language": {
+    "description": "Etiqueta de configuración de idioma"
+  },
+  "selectLanguage": "Seleccionar idioma de la app",
+  "@selectLanguage": {
+    "description": "Título del diálogo de selección de idioma"
+  },
+  "spanish": "Español",
+  "@spanish": {
+    "description": "Opción de idioma español"
+  },
+  "english": "English",
+  "@english": {
+    "description": "Opción de idioma inglés"
+  },
+  "notifications": "Notificaciones",
+  "@notifications": {
+    "description": "Etiqueta de configuración de notificaciones"
+  },
+  "notificationsSubtitle": "Preferencias de avisos",
+  "@notificationsSubtitle": {
+    "description": "Subtítulo de notificaciones"
+  },
+  "enableNotifications": "Activar notificaciones",
+  "@enableNotifications": {
+    "description": "Toggle de activar notificaciones"
+  },
+  "notificationSettings": "Configuración de notificaciones",
+  "@notificationSettings": {
+    "description": "Etiqueta de configuración de notificaciones"
+  },
+  "helpSupport": "Ayuda y soporte",
+  "@helpSupport": {
+    "description": "Etiqueta de ayuda y soporte"
+  },
+  "helpSupportSubtitle": "Centro de ayuda y contacto",
+  "@helpSupportSubtitle": {
+    "description": "Subtítulo de ayuda y soporte"
+  },
+  "helpCenter": "Centro de ayuda",
+  "@helpCenter": {
+    "description": "Etiqueta de centro de ayuda"
+  },
+  "contactSupport": "Contactar soporte",
+  "@contactSupport": {
+    "description": "Etiqueta de contactar soporte"
+  },
+  "faq": "Preguntas frecuentes",
+  "@faq": {
+    "description": "Etiqueta de preguntas frecuentes"
+  },
+  "documentation": "Documentación",
+  "@documentation": {
+    "description": "Etiqueta de documentación"
+  },
+  "about": "Acerca de",
+  "@about": {
+    "description": "Etiqueta de acerca de"
+  },
+  "aboutSubtitle": "Información de la aplicación",
+  "@aboutSubtitle": {
+    "description": "Subtítulo de acerca de"
+  },
+  "version": "Versión",
+  "@version": {
+    "description": "Etiqueta de versión"
+  },
+  "build": "Compilación",
+  "@build": {
+    "description": "Etiqueta de compilación"
+  },
+  "termsOfService": "Términos de servicio",
+  "@termsOfService": {
+    "description": "Etiqueta de términos de servicio"
+  },
+  "privacyPolicy": "Política de privacidad",
+  "@privacyPolicy": {
+    "description": "Etiqueta de política de privacidad"
+  },
+  "licenses": "Licencias",
+  "@licenses": {
+    "description": "Etiqueta de licencias"
+  },
+  "profile": "Mi Perfil",
+  "@profile": {
+    "description": "Etiqueta de perfil"
+  },
+  "myProfile": "Mi Perfil",
+  "@myProfile": {
+    "description": "Título de la pantalla mi perfil"
+  },
+  "editProfile": "Editar perfil",
+  "@editProfile": {
+    "description": "Etiqueta del botón editar perfil"
+  },
+  "personalInfo": "Información Personal",
+  "@personalInfo": {
+    "description": "Título de la sección de información personal"
+  },
+  "location": "Ubicación",
+  "@location": {
+    "description": "Título de la sección de ubicación"
+  },
+  "legalData": "Datos legales",
+  "@legalData": {
+    "description": "Título de la sección de datos legales"
+  },
+  "legalDataRut": "RUT del usuario o Representante Legal",
+  "@legalDataRut": {
+    "description": "Etiqueta del campo RUT en datos legales"
+  },
+  "legalDataBusinessName": "Razón Social",
+  "@legalDataBusinessName": {
+    "description": "Etiqueta del campo razón social en datos legales"
+  },
+  "sagRegistryNumber": "N° de Registro de Apicultor/a en el SAG",
+  "@sagRegistryNumber": {
+    "description": "Etiqueta del campo número de registro SAG"
+  },
+  "memberSince": "Miembro desde",
+  "@memberSince": {
+    "description": "Etiqueta de miembro desde"
+  },
+  "userId": "ID de usuario",
+  "@userId": {
+    "description": "Etiqueta de ID de usuario"
+  },
+  "profilePicture": "Foto de perfil",
+  "@profilePicture": {
+    "description": "Etiqueta de foto de perfil"
+  },
+  "selectPhoto": "Seleccionar foto",
+  "@selectPhoto": {
+    "description": "Título del diálogo de seleccionar foto"
+  },
+  "takePhoto": "Tomar foto",
+  "@takePhoto": {
+    "description": "Opción de tomar foto"
+  },
+  "chooseFromGallery": "Elegir de galería",
+  "@chooseFromGallery": {
+    "description": "Opción de elegir de galería"
+  },
+  "removePhoto": "Eliminar foto",
+  "@removePhoto": {
+    "description": "Opción de eliminar foto"
+  },
+  "photoSelected": "Foto seleccionada (vista previa)",
+  "@photoSelected": {
+    "description": "Confirmación de foto seleccionada"
+  },
+  "photoRemoved": "Foto eliminada (vista previa)",
+  "@photoRemoved": {
+    "description": "Confirmación de foto eliminada"
+  },
+  "changePassword": "Cambiar contraseña",
+  "@changePassword": {
+    "description": "Etiqueta de cambiar contraseña"
+  },
+  "changePasswordSubtitle": "Actualiza tu contraseña",
+  "@changePasswordSubtitle": {
+    "description": "Subtítulo de cambiar contraseña"
+  },
+  "twoFactorAuth": "Autenticación en dos pasos",
+  "@twoFactorAuth": {
+    "description": "Etiqueta de autenticación en dos pasos"
+  },
+  "twoFactorAuthSubtitle": "Añade una capa extra de seguridad",
+  "@twoFactorAuthSubtitle": {
+    "description": "Subtítulo de autenticación en dos pasos"
+  },
+  "securitySettings": "Configuración de seguridad",
+  "@securitySettings": {
+    "description": "Etiqueta de configuración de seguridad"
+  },
+  "languageSettings": "Idioma",
+  "@languageSettings": {
+    "description": "Etiqueta de configuración de idioma"
+  },
+  "languageSubtitle": "Español",
+  "@languageSubtitle": {
+    "description": "Subtítulo de idioma"
+  },
+  "dataManagement": "Gestión de datos",
+  "@dataManagement": {
+    "description": "Etiqueta de gestión de datos"
+  },
+  "dataManagementSubtitle": "Historial y almacenamiento",
+  "@dataManagementSubtitle": {
+    "description": "Subtítulo de gestión de datos"
+  },
+  "storageManagement": "Gestión de almacenamiento",
+  "@storageManagement": {
+    "description": "Etiqueta de gestión de almacenamiento"
+  },
+  "clearCache": "Limpiar caché",
+  "@clearCache": {
+    "description": "Etiqueta del botón limpiar caché"
+  },
+  "clearHistory": "Limpiar historial",
+  "@clearHistory": {
+    "description": "Etiqueta del botón limpiar historial"
+  },
+  "freePlan": "Plan Gratuito",
+  "@freePlan": {
+    "description": "Etiqueta de plan gratuito"
+  },
+  "premiumPlan": "Plan Premium",
+  "@premiumPlan": {
+    "description": "Etiqueta de plan premium"
+  },
+  "upgradePlan": "Actualizar plan",
+  "@upgradePlan": {
+    "description": "Etiqueta del botón actualizar plan"
+  },
+  "upgradeForMore": "Actualiza para más funciones",
+  "@upgradeForMore": {
+    "description": "Subtítulo de actualizar plan"
+  },
+  "viewPremiumPlans": "Ver planes Premium",
+  "@viewPremiumPlans": {
+    "description": "Etiqueta del botón ver planes premium"
+  },
+  "currentPlan": "Plan actual",
+  "@currentPlan": {
+    "description": "Etiqueta de plan actual"
+  },
+  "billing": "Facturación",
+  "@billing": {
+    "description": "Etiqueta de facturación"
+  },
+  "paymentMethod": "Método de pago",
+  "@paymentMethod": {
+    "description": "Etiqueta de método de pago"
+  },
+  "deleteAccount": "Eliminar cuenta",
+  "@deleteAccount": {
+    "description": "Etiqueta del botón eliminar cuenta"
+  },
+  "deleteAccountConfirm": "Esta acción es irreversible. Se eliminarán todos tus datos y conversaciones.",
+  "@deleteAccountConfirm": {
+    "description": "Mensaje de confirmación de eliminar cuenta"
+  },
+  "accountDeleted": "Cuenta eliminada",
+  "@accountDeleted": {
+    "description": "Confirmación de cuenta eliminada"
+  },
+  "welcomeToBMaia": "¡Bienvenido a B-MaiA!",
+  "@welcomeToBMaia": {
+    "description": "Mensaje de bienvenida a B-MaiA"
+  },
+  "onboardingTitle1": "¡Bienvenido a B-MaiA!",
+  "@onboardingTitle1": {
+    "description": "Título de la pantalla de onboarding 1"
+  },
+  "onboardingDesc1": "Descubre una nueva forma de gestionar tus proyectos con inteligencia artificial avanzada.",
+  "@onboardingDesc1": {
+    "description": "Descripción de la pantalla de onboarding 1"
+  },
+  "onboardingTitle2": "Tecnología Avanzada",
+  "@onboardingTitle2": {
+    "description": "Título de la pantalla de onboarding 2"
+  },
+  "onboardingDesc2": "Utilizamos las últimas innovaciones en IA para brindarte la mejor experiencia posible.",
+  "@onboardingDesc2": {
+    "description": "Descripción de la pantalla de onboarding 2"
+  },
+  "onboardingTitle3": "Experiencia Personalizada",
+  "@onboardingTitle3": {
+    "description": "Título de la pantalla de onboarding 3"
+  },
+  "onboardingDesc3": "Cada función está diseñada pensando en tus necesidades específicas y preferencias.",
+  "@onboardingDesc3": {
+    "description": "Descripción de la pantalla de onboarding 3"
+  },
+  "getStarted": "Comenzar",
+  "@getStarted": {
+    "description": "Etiqueta del botón comenzar"
+  },
+  "viewIntroduction": "Ver introducción",
+  "@viewIntroduction": {
+    "description": "Etiqueta del botón ver introducción"
+  },
+  "errorGeneric": "Ha ocurrido un error",
+  "@errorGeneric": {
+    "description": "Mensaje de error genérico"
+  },
+  "errorConnection": "Error de conexión",
+  "@errorConnection": {
+    "description": "Mensaje de error de conexión"
+  },
+  "errorTimeout": "Tiempo de espera agotado",
+  "@errorTimeout": {
+    "description": "Mensaje de error de tiempo agotado"
+  },
+  "errorServer": "Error del servidor",
+  "@errorServer": {
+    "description": "Mensaje de error del servidor"
+  },
+  "errorNotFound": "No encontrado",
+  "@errorNotFound": {
+    "description": "Mensaje de error no encontrado"
+  },
+  "errorUnauthorized": "No autorizado",
+  "@errorUnauthorized": {
+    "description": "Mensaje de error no autorizado"
+  },
+  "errorForbidden": "Acceso denegado",
+  "@errorForbidden": {
+    "description": "Mensaje de error acceso denegado"
+  },
+  "errorTryAgain": "Por favor, inténtalo de nuevo",
+  "@errorTryAgain": {
+    "description": "Mensaje de error intentar de nuevo"
+  },
+  "errorImageSelection": "Error al seleccionar la imagen",
+  "@errorImageSelection": {
+    "description": "Mensaje de error al seleccionar imagen"
+  },
+  "featureInDevelopment": "Funcionalidad en desarrollo",
+  "@featureInDevelopment": {
+    "description": "Mensaje de funcionalidad en desarrollo"
+  },
+  "successGeneric": "Operación exitosa",
+  "@successGeneric": {
+    "description": "Mensaje de éxito genérico"
+  },
+  "successSaved": "Guardado exitosamente",
+  "@successSaved": {
+    "description": "Mensaje de éxito al guardar"
+  },
+  "successUpdated": "Actualizado exitosamente",
+  "@successUpdated": {
+    "description": "Mensaje de éxito al actualizar"
+  },
+  "successDeleted": "Eliminado exitosamente",
+  "@successDeleted": {
+    "description": "Mensaje de éxito al eliminar"
+  },
+  "successSent": "Enviado exitosamente",
+  "@successSent": {
+    "description": "Mensaje de éxito al enviar"
+  },
+  "menu": "Menú",
+  "@menu": {
+    "description": "Etiqueta de menú"
+  },
+  "chats": "Conversaciones",
+  "@chats": {
+    "description": "Etiqueta de conversaciones"
+  },
+  "chatHistory": "{count, plural, =0{Sin conversaciones} =1{1 conversación} other{{count} conversaciones}}",
+  "@chatHistory": {
+    "description": "Contador de historial de chat",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+  "myAccount": "Mi Cuenta",
+  "@myAccount": {
+    "description": "Etiqueta de mi cuenta"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Etiqueta de chat"
+  },
+  "message": "Mensaje",
+  "@message": {
+    "description": "Etiqueta de mensaje"
+  },
+  "messages": "Mensajes",
+  "@messages": {
+    "description": "Etiqueta de mensajes"
+  },
+  "noMessages": "No hay mensajes",
+  "@noMessages": {
+    "description": "Etiqueta de no hay mensajes"
+  },
+  "typing": "Escribiendo...",
+  "@typing": {
+    "description": "Indicador de escritura"
+  },
+  "online": "En línea",
+  "@online": {
+    "description": "Estado en línea"
+  },
+  "offline": "Desconectado",
+  "@offline": {
+    "description": "Estado desconectado"
+  },
+  "lastSeen": "Visto por última vez",
+  "@lastSeen": {
+    "description": "Etiqueta de visto por última vez"
+  },
+  "readBy": "Leído por",
+  "@readBy": {
+    "description": "Etiqueta de leído por"
+  },
+  "deliveredTo": "Entregado a",
+  "@deliveredTo": {
+    "description": "Etiqueta de entregado a"
+  },
+  "sent": "Enviado",
+  "@sent": {
+    "description": "Estado enviado"
+  },
+  "received": "Recibido",
+  "@received": {
+    "description": "Estado recibido"
+  },
+  "read": "Leído",
+  "@read": {
+    "description": "Estado leído"
+  },
+  "now": "Ahora",
+  "@now": {
+    "description": "Marca de tiempo ahora"
+  },
+  "today": "Hoy",
+  "@today": {
+    "description": "Marca de tiempo hoy"
+  },
+  "yesterday": "Ayer",
+  "@yesterday": {
+    "description": "Marca de tiempo ayer"
+  },
+  "minutesAgo": "{count, plural, =1{Hace 1 minuto} other{Hace {count} minutos}}",
+  "@minutesAgo": {
+    "description": "Marca de tiempo hace minutos",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count, plural, =1{Hace 1 hora} other{Hace {count} horas}}",
+  "@hoursAgo": {
+    "description": "Marca de tiempo hace horas",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count, plural, =1{Hace 1 día} other{Hace {count} días}}",
+  "@daysAgo": {
+    "description": "Marca de tiempo hace días",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orWord": "o",
+  "@orWord": {
+    "description": "Conjunción 'o'"
+  },
+  "andWord": "y",
+  "@andWord": {
+    "description": "Conjunción 'y'"
+  },
+  "toWord": "a",
+  "@toWord": {
+    "description": "Preposición 'a'"
+  },
+  "fromWord": "de",
+  "@fromWord": {
+    "description": "Preposición 'de'"
+  },
+  "inWord": "en",
+  "@inWord": {
+    "description": "Preposición 'en'"
+  },
+  "atWord": "en",
+  "@atWord": {
+    "description": "Preposición 'en'"
+  },
+  "onWord": "el",
+  "@onWord": {
+    "description": "Preposición 'el'"
+  },
+  "byWord": "por",
+  "@byWord": {
+    "description": "Preposición 'por'"
+  },
+  "withWord": "con",
+  "@withWord": {
+    "description": "Preposición 'con'"
+  },
+  "withoutWord": "sin",
+  "@withoutWord": {
+    "description": "Preposición 'sin'"
+  },
+  "forWord": "para",
+  "@forWord": {
+    "description": "Preposición 'para'"
+  },
+  "notAvailable": "—",
+  "@notAvailable": {
+    "description": "Marcador de no disponible"
+  },
+  "comingSoon": "Próximamente",
+  "@comingSoon": {
+    "description": "Etiqueta de próximamente"
+  },
+  "betaLabel": "Beta",
+  "@betaLabel": {
+    "description": "Etiqueta de función beta"
+  },
+  "newLabel": "Nuevo",
+  "@newLabel": {
+    "description": "Etiqueta de función nueva"
+  },
+  "nameMinLength": "El nombre debe tener al menos 3 caracteres",
+  "@nameMinLength": {
+    "description": "Validación de longitud mínima de nombre"
+  }
+}

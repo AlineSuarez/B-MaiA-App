@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/theme_provider.dart';
 import 'package:bmaia/screens/settings_screen.dart';
 import 'package:bmaia/screens/profile_screen.dart';
@@ -9,6 +10,8 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Obtener el estado del tema
     final provider = Provider.of<ThemeProvider>(context);
     final platform = MediaQuery.of(context).platformBrightness;
@@ -65,11 +68,12 @@ class CustomDrawer extends StatelessWidget {
               isLandscape,
               context,
               isDark,
+              l10n,
             ),
           ),
 
           // Footer minimalista - FIJO (siempre abajo)
-          _buildFooter(isTablet, isLandscape, context, isDark),
+          _buildFooter(isTablet, isLandscape, context, isDark, l10n),
         ],
       ),
     );
@@ -80,6 +84,7 @@ class CustomDrawer extends StatelessWidget {
     bool isLandscape,
     BuildContext context,
     bool isDark,
+    AppLocalizations l10n,
   ) {
     final chats = [
       {'title': 'Flutter Development', 'time': '2m', 'isActive': true},
@@ -97,7 +102,7 @@ class CustomDrawer extends StatelessWidget {
       padding: EdgeInsets.zero,
       children: [
         // Nuevo Chat minimalista - ahora hace scroll
-        _buildNewChatButton(isTablet, isLandscape, context, isDark),
+        _buildNewChatButton(isTablet, isLandscape, context, isDark, l10n),
 
         // Espaciado elegante - reducido en horizontal
         SizedBox(height: isLandscape ? 12 : (isTablet ? 24 : 16)),
@@ -113,7 +118,7 @@ class CustomDrawer extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                'Historial',
+                l10n.history,
                 style: TextStyle(
                   fontSize: isLandscape
                       ? (isTablet ? 12 : 11)
@@ -271,6 +276,7 @@ class CustomDrawer extends StatelessWidget {
     bool isLandscape,
     BuildContext context,
     bool isDark,
+    AppLocalizations l10n,
   ) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -297,7 +303,7 @@ class CustomDrawer extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Nueva conversación',
+                  l10n.newConversation,
                   style: TextStyle(
                     fontSize: isLandscape
                         ? (isTablet ? 14 : 12)
@@ -439,6 +445,7 @@ class CustomDrawer extends StatelessWidget {
     bool isLandscape,
     BuildContext context,
     bool isDark,
+    AppLocalizations l10n,
   ) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -461,7 +468,7 @@ class CustomDrawer extends StatelessWidget {
         children: [
           _buildFooterItem(
             icon: Icons.settings_rounded,
-            title: 'Configuración',
+            title: l10n.settings,
             isTablet: isTablet,
             isLandscape: isLandscape,
             isDark: isDark,
@@ -477,7 +484,7 @@ class CustomDrawer extends StatelessWidget {
           ),
           _buildFooterItem(
             icon: Icons.person_rounded,
-            title: 'Mi Cuenta',
+            title: l10n.myAccount,
             isTablet: isTablet,
             isLandscape: isLandscape,
             isDark: isDark,

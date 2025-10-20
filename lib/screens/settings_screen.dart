@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/background_gradient.dart';
 
@@ -43,14 +45,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String _themeLabel(ThemeMode mode) {
+  String _themeLabel(ThemeMode mode, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (mode) {
       case ThemeMode.light:
-        return 'Claro';
+        return l10n.themeLight;
       case ThemeMode.dark:
-        return 'Oscuro';
+        return l10n.themeDark;
       case ThemeMode.system:
-        return 'Seguir sistema';
+        return l10n.themeSystem;
     }
   }
 
@@ -59,15 +62,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ThemeMode current,
     ThemeProvider provider,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        // Usamos StatefulBuilder para que el modal se reconstruya con cambios de orientación
         return StatefulBuilder(
           builder: (context, setState) {
-            // Calculamos estos valores dentro del builder para que se actualicen
             final platform = MediaQuery.of(context).platformBrightness;
             final orientation = MediaQuery.of(context).orientation;
             final screenHeight = MediaQuery.of(context).size.height;
@@ -117,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           horizontal: 20,
                         ),
                         child: Text(
-                          'Seleccionar tema',
+                          l10n.selectTheme,
                           style: TextStyle(
                             fontSize: isLandscape ? 18 : 20,
                             fontWeight: FontWeight.bold,
@@ -137,8 +139,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Expanded(
                                 child: _buildModalOption(
                                   context: ctx,
-                                  title: 'Sistema',
-                                  subtitle: 'Seguir sistema',
+                                  title: l10n.systemTheme,
+                                  subtitle: l10n.systemThemeSubtitle,
                                   icon: Icons.settings_suggest_rounded,
                                   value: ThemeMode.system,
                                   current: current,
@@ -154,8 +156,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Expanded(
                                 child: _buildModalOption(
                                   context: ctx,
-                                  title: 'Claro',
-                                  subtitle: 'Modo claro',
+                                  title: l10n.lightMode,
+                                  subtitle: l10n.lightModeSubtitle,
                                   icon: Icons.light_mode_rounded,
                                   value: ThemeMode.light,
                                   current: current,
@@ -171,8 +173,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Expanded(
                                 child: _buildModalOption(
                                   context: ctx,
-                                  title: 'Oscuro',
-                                  subtitle: 'Modo oscuro',
+                                  title: l10n.darkMode,
+                                  subtitle: l10n.darkModeSubtitle,
                                   icon: Icons.dark_mode_rounded,
                                   value: ThemeMode.dark,
                                   current: current,
@@ -193,8 +195,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             _buildModalOption(
                               context: ctx,
-                              title: 'Seguir sistema',
-                              subtitle: 'Usar el tema del sistema operativo',
+                              title: l10n.themeSystem,
+                              subtitle: l10n.useSystemTheme,
                               icon: Icons.settings_suggest_rounded,
                               value: ThemeMode.system,
                               current: current,
@@ -207,8 +209,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             _buildModalOption(
                               context: ctx,
-                              title: 'Claro',
-                              subtitle: 'Forzar modo claro',
+                              title: l10n.themeLight,
+                              subtitle: l10n.lightModeSubtitle,
                               icon: Icons.light_mode_rounded,
                               value: ThemeMode.light,
                               current: current,
@@ -221,8 +223,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             _buildModalOption(
                               context: ctx,
-                              title: 'Oscuro',
-                              subtitle: 'Forzar modo oscuro',
+                              title: l10n.themeDark,
+                              subtitle: l10n.darkModeSubtitle,
                               icon: Icons.dark_mode_rounded,
                               value: ThemeMode.dark,
                               current: current,
@@ -397,23 +399,121 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _openLanguageModal(BuildContext context, LocaleProvider localeProvider) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF23234A) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.3)
+                        : Colors.grey.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 20,
+                  ),
+                  child: Text(
+                    l10n.selectLanguage,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: const Text('🇪🇸', style: TextStyle(fontSize: 28)),
+                  title: Text(
+                    l10n.spanish,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                      fontWeight: localeProvider.locale.languageCode == 'es'
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: localeProvider.locale.languageCode == 'es'
+                      ? Icon(
+                          Icons.check_circle,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF2f43a7),
+                        )
+                      : null,
+                  onTap: () {
+                    localeProvider.setLocale(const Locale('es'));
+                    Navigator.pop(ctx);
+                  },
+                ),
+                ListTile(
+                  leading: const Text('🇬🇧', style: TextStyle(fontSize: 28)),
+                  title: Text(
+                    l10n.english,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                      fontWeight: localeProvider.locale.languageCode == 'en'
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: localeProvider.locale.languageCode == 'en'
+                      ? Icon(
+                          Icons.check_circle,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF2f43a7),
+                        )
+                      : null,
+                  onTap: () {
+                    localeProvider.setLocale(const Locale('en'));
+                    Navigator.pop(ctx);
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ThemeProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final localeProvider = Provider.of<LocaleProvider>(context);
     final platform = MediaQuery.of(context).platformBrightness;
-    final themeMode = provider.themeMode;
+    final themeMode = themeProvider.themeMode;
     final isDark =
         themeMode == ThemeMode.dark ||
         (themeMode == ThemeMode.system && platform == Brightness.dark);
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    // Configurar la barra de estado según el tema - CORREGIDO
     final overlayStyle = SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      // CORREGIDO: iconos oscuros para fondo claro, iconos claros para fondo oscuro
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-      // CORREGIDO: brightness del fondo de la status bar
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: isDark
           ? const Color(0xFF0F1220)
@@ -423,7 +523,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           : Brightness.dark,
     );
 
-    // Aplicar el estilo de sistema ANTES de construir el Scaffold
     SystemChrome.setSystemUIOverlayStyle(overlayStyle);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -434,10 +533,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          // AÑADIR: Configurar específicamente la barra del app
           systemOverlayStyle: overlayStyle,
           title: Text(
-            'Configuración',
+            l10n.settings,
             style: TextStyle(
               color: isDark ? Colors.white : const Color(0xFF2f43a7),
               fontWeight: FontWeight.bold,
@@ -459,14 +557,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               children: [
                 // Sección Apariencia
-                _buildSectionTitle('Apariencia', isDark),
+                _buildSectionTitle(l10n.appearance, isDark),
                 _buildSimpleTile(
                   icon: isDark
                       ? Icons.dark_mode_rounded
                       : Icons.light_mode_rounded,
-                  title: 'Tema',
-                  subtitle: _themeLabel(themeMode),
-                  onTap: () => _openThemeModal(context, themeMode, provider),
+                  title: l10n.theme,
+                  subtitle: _themeLabel(themeMode, context),
+                  onTap: () =>
+                      _openThemeModal(context, themeMode, themeProvider),
                   isTablet: isTablet,
                   darkMode: isDark,
                 ),
@@ -474,35 +573,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SizedBox(height: isTablet ? 32 : 20),
 
                 // Sección Aplicación
-                _buildSectionTitle('Aplicación', isDark),
+                _buildSectionTitle(l10n.application, isDark),
                 _buildSimpleTile(
                   icon: Icons.notifications_none_rounded,
-                  title: 'Notificaciones',
-                  subtitle: 'Preferencias de avisos',
+                  title: l10n.notifications,
+                  subtitle: l10n.notificationsSubtitle,
                   onTap: () {},
                   isTablet: isTablet,
                   darkMode: isDark,
                 ),
                 _buildSimpleTile(
                   icon: Icons.language_rounded,
-                  title: 'Idioma',
-                  subtitle: 'Seleccionar idioma de la app',
-                  onTap: () {},
+                  title: l10n.language,
+                  subtitle: localeProvider.getLanguageName(),
+                  onTap: () => _openLanguageModal(context, localeProvider),
                   isTablet: isTablet,
                   darkMode: isDark,
                 ),
                 _buildSimpleTile(
                   icon: Icons.help_outline_rounded,
-                  title: 'Ayuda y soporte',
-                  subtitle: 'Centro de ayuda y contacto',
+                  title: l10n.helpSupport,
+                  subtitle: l10n.helpSupportSubtitle,
                   onTap: () {},
                   isTablet: isTablet,
                   darkMode: isDark,
                 ),
                 _buildSimpleTile(
                   icon: Icons.info_outline_rounded,
-                  title: 'Acerca de',
-                  subtitle: 'Información de la aplicación',
+                  title: l10n.about,
+                  subtitle: l10n.aboutSubtitle,
                   onTap: () {},
                   isTablet: isTablet,
                   darkMode: isDark,

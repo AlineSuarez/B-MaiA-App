@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 
 import '../providers/theme_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/background_gradient.dart';
 import '../widgets/custom_drawer.dart';
 import '../widgets/chat/chat_list.dart';
-import '../screens/voice_demo_screen.dart';
-
-// 👇 añade estos imports
-import '../services/api_client.dart';
+import '../screens/onboarding_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -99,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final chatProvider = Provider.of<ChatProvider>(context);
     final platform = MediaQuery.of(context).platformBrightness;
@@ -148,13 +147,20 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 children: [
                   // Header
-                  _buildHeader(isTablet, screenWidth, isDark, hasMessages),
+                  _buildHeader(
+                    l10n,
+                    isTablet,
+                    screenWidth,
+                    isDark,
+                    hasMessages,
+                  ),
 
                   // Contenido principal
                   Expanded(
                     child: hasMessages
                         ? const ChatList()
                         : _buildEmptyState(
+                            l10n,
                             isTablet,
                             screenWidth,
                             isDark,
@@ -164,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                   // Input de mensaje
                   _buildMessageInput(
+                    l10n,
                     isTablet,
                     keyboardHeight,
                     isDark,
@@ -179,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildHeader(
+    AppLocalizations l10n,
     bool isTablet,
     double screenWidth,
     bool isDark,
@@ -215,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'B-MaiA',
+                  l10n.appName,
                   style: TextStyle(
                     fontSize: isTablet ? 20 : 18,
                     fontWeight: FontWeight.bold,
@@ -225,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 if (!hasMessages)
                   Text(
-                    'Asistente inteligente',
+                    l10n.intelligentAssistant,
                     style: TextStyle(
                       fontSize: isTablet ? 13 : 11,
                       color: isDark
@@ -248,62 +256,24 @@ class _HomeScreenState extends State<HomeScreen>
                     : const Color(0xFF2f43a7),
                 size: isTablet ? 24 : 22,
               ),
-              tooltip: 'Limpiar chat',
+              tooltip: l10n.clearChat,
               onPressed: () {
-                _showClearChatDialog();
+                _showClearChatDialog(l10n, isDark);
               },
             ),
 
-          // Botón para abrir B-Maia por voz
-          IconButton(
-            icon: Icon(
-              Icons.mic_none_rounded,
-              color: isDark ? Colors.white : const Color(0xFF2f43a7),
-              size: isTablet ? 24 : 22,
-            ),
-            tooltip: 'Hablar con B-Maia',
-            onPressed: () {
-              final apiClient = ApiClient();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => VoiceDemoScreen(
-                    baseUrl: apiClient.dio.options.baseUrl,
-                    // toma el bearer actual del header (si está), o devuelve ''.
-                    getToken: () async =>
-                        apiClient.dio.options.headers['Authorization']
-                            ?.toString()
-                            .replaceFirst('Bearer ', '') ??
-                        '',
-                  ),
-                ),
-              );
-            },
-          ),
-
-          // Botón “info” (ahora también abre la pantalla de voz con args correctos)
+          // Botón "info" que abre onboarding
           IconButton(
             icon: Icon(
               Icons.info_outline_rounded,
               color: isDark ? Colors.white : const Color(0xFF2f43a7),
               size: isTablet ? 24 : 22,
             ),
-            tooltip: 'Ver introducción',
+            tooltip: l10n.getStarted,
             onPressed: () {
-              final apiClient = ApiClient();
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => VoiceDemoScreen(
-                    baseUrl: apiClient.dio.options.baseUrl,
-                    // toma el bearer actual del header (si está), o devuelve ''.
-                    getToken: () async =>
-                        apiClient.dio.options.headers['Authorization']
-                            ?.toString()
-                            .replaceFirst('Bearer ', '') ??
-                        '',
-                  ),
-                ),
+                MaterialPageRoute(builder: (_) => const OnboardingScreen()),
               );
             },
           ),
@@ -313,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildEmptyState(
+    AppLocalizations l10n,
     bool isTablet,
     double screenWidth,
     bool isDark,
@@ -327,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '¡Hola! Soy B-MaiA',
+                l10n.helloBMaia,
                 style: TextStyle(
                   fontSize: isTablet ? 20 : 18,
                   fontWeight: FontWeight.bold,
@@ -338,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
               SizedBox(height: isTablet ? 8 : 6),
               Text(
-                'Escribe tu primera pregunta',
+                l10n.writeFirstQuestion,
                 style: TextStyle(
                   fontSize: isTablet ? 14 : 12,
                   color: isDark
@@ -383,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen>
 
             // Mensaje de bienvenida
             Text(
-              '¡Hola! Soy B-MaiA',
+              l10n.helloBMaia,
               style: TextStyle(
                 fontSize: isTablet ? 32 : 28,
                 fontWeight: FontWeight.bold,
@@ -400,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen>
                 maxWidth: isTablet ? 500 : screenWidth * 0.85,
               ),
               child: Text(
-                'Tu asistente de inteligencia artificial. Pregúntame lo que necesites, estoy aquí para ayudarte.',
+                l10n.aiAssistantDescription,
                 style: TextStyle(
                   fontSize: isTablet ? 16 : 14,
                   color: isDark
@@ -416,25 +387,25 @@ class _HomeScreenState extends State<HomeScreen>
             SizedBox(height: isTablet ? 32 : 24),
 
             // Sugerencias
-            _buildSuggestions(isTablet, isDark),
+            _buildSuggestions(l10n, isTablet, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSuggestions(bool isTablet, bool isDark) {
+  Widget _buildSuggestions(AppLocalizations l10n, bool isTablet, bool isDark) {
     final suggestions = [
-      {'icon': Icons.lightbulb_outline, 'text': '¿Cómo puedes ayudarme?'},
-      {'icon': Icons.code, 'text': 'Ayúdame con programación'},
-      {'icon': Icons.school_outlined, 'text': 'Explícame un concepto'},
-      {'icon': Icons.create_outlined, 'text': 'Ayúdame a escribir'},
+      {'icon': Icons.lightbulb_outline, 'text': l10n.howCanYouHelp},
+      {'icon': Icons.code, 'text': l10n.helpWithProgramming},
+      {'icon': Icons.school_outlined, 'text': l10n.explainConcept},
+      {'icon': Icons.create_outlined, 'text': l10n.helpMeWrite},
     ];
 
     return Column(
       children: [
         Text(
-          'Prueba preguntando:',
+          l10n.trySaying,
           style: TextStyle(
             fontSize: isTablet ? 15 : 13,
             color: isDark
@@ -514,6 +485,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildMessageInput(
+    AppLocalizations l10n,
     bool isTablet,
     double keyboardHeight,
     bool isDark,
@@ -664,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen>
                   decoration: InputDecoration(
                     hintText: isTyping
                         ? 'B-MaiA está escribiendo...'
-                        : 'Escribe tu mensaje aquí...',
+                        : l10n.messageInputPlaceholder,
                     hintStyle: TextStyle(
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.4)
@@ -783,14 +755,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  void _showClearChatDialog() {
-    final isDark =
-        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
-            ThemeMode.dark ||
-        (Provider.of<ThemeProvider>(context, listen: false).themeMode ==
-                ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
-
+  void _showClearChatDialog(AppLocalizations l10n, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -805,7 +770,7 @@ class _HomeScreenState extends State<HomeScreen>
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Limpiar chat',
+                l10n.clearChat,
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF2f43a7),
                   fontWeight: FontWeight.bold,
@@ -826,7 +791,7 @@ class _HomeScreenState extends State<HomeScreen>
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancelar',
+              l10n.cancel,
               style: TextStyle(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.7)
@@ -849,7 +814,7 @@ class _HomeScreenState extends State<HomeScreen>
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Limpiar'),
+            child: Text(l10n.delete),
           ),
         ],
       ),

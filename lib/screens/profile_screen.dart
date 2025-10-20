@@ -5,10 +5,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_localizations.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/background_gradient.dart';
 import '../services/profile_service.dart';
 import '../services/api_client.dart';
+import '../providers/locale_provider.dart';
 import 'login_screen.dart';
 import 'package:dio/dio.dart';
 
@@ -209,6 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Helpers de UI
   // ------------------------------
   Future<void> _pickImage(ImageSource source) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final XFile? image = await _picker.pickImage(
         source: source,
@@ -218,14 +221,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       if (image != null) {
         setState(() => _profileImagePath = image.path);
-        _showSuccessMessage('Foto seleccionada (vista previa)');
+        _showSuccessMessage(l10n.photoSelected);
       }
     } catch (_) {
-      _showErrorMessage('Error al seleccionar la imagen');
+      _showErrorMessage(l10n.errorImageSelection);
     }
   }
 
   void _showImageSourceDialog(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -252,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  'Seleccionar foto',
+                  l10n.selectPhoto,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -266,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: isDark ? Colors.white : const Color(0xFF2f43a7),
                 ),
                 title: Text(
-                  'Tomar foto',
+                  l10n.takePhoto,
                   style: TextStyle(
                     color: isDark ? Colors.white : const Color(0xFF2f43a7),
                   ),
@@ -282,7 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: isDark ? Colors.white : const Color(0xFF2f43a7),
                 ),
                 title: Text(
-                  'Elegir de galería',
+                  l10n.chooseFromGallery,
                   style: TextStyle(
                     color: isDark ? Colors.white : const Color(0xFF2f43a7),
                   ),
@@ -299,13 +303,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Colors.red.withValues(alpha: 0.8),
                   ),
                   title: Text(
-                    'Eliminar foto',
+                    l10n.removePhoto,
                     style: TextStyle(color: Colors.red.withValues(alpha: 0.8)),
                   ),
                   onTap: () {
                     Navigator.pop(context);
                     setState(() => _profileImagePath = null);
-                    _showSuccessMessage('Foto eliminada (vista previa)');
+                    _showSuccessMessage(l10n.photoRemoved);
                   },
                 ),
               const SizedBox(height: 16),
@@ -345,6 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ------------------------------
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<ThemeProvider>(context);
     final platform = MediaQuery.of(context).platformBrightness;
     final themeMode = provider.themeMode;
@@ -377,7 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           elevation: 0,
           systemOverlayStyle: overlayStyle,
           title: Text(
-            'Mi Perfil',
+            l10n.myProfile,
             style: TextStyle(
               color: isDark ? Colors.white : const Color(0xFF2f43a7),
               fontWeight: FontWeight.bold,
@@ -393,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: BackgroundGradient(
           child: SafeArea(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : RefreshIndicator(
                     onRefresh: _pullToRefresh,
                     child: ListView(
@@ -403,22 +408,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       children: [
                         // Header (avatar + nombre/correo)
-                        _buildProfileHeader(isDark, isTablet),
+                        _buildProfileHeader(l10n, isDark, isTablet),
 
                         SizedBox(height: isTablet ? 32 : 24),
 
                         // ------- Datos legales -------
-                        _buildSectionTitle('Datos legales', isDark),
+                        _buildSectionTitle(l10n.legalData, isDark),
                         _buildReadOnlyTile(
                           icon: Icons.badge_outlined,
-                          title: 'RUT del usuario o Representante Legal',
+                          title: l10n.legalDataRut,
                           value: _display(_rut),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.apartment_outlined,
-                          title: 'Razón Social',
+                          title: l10n.legalDataBusinessName,
                           value: _display(_razonSocial),
                           isTablet: isTablet,
                           isDark: isDark,
@@ -427,31 +432,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: isTablet ? 24 : 16),
 
                         // ------- Información personal -------
-                        _buildSectionTitle('Información Personal', isDark),
+                        _buildSectionTitle(l10n.personalInfo, isDark),
                         _buildReadOnlyTile(
                           icon: Icons.person_outline_rounded,
-                          title: 'Nombres',
+                          title: l10n.firstName,
                           value: _display(_nombres),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.person_2_outlined,
-                          title: 'Apellidos',
+                          title: l10n.lastName,
                           value: _display(_apellidos),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.email_outlined,
-                          title: 'Correo electrónico',
+                          title: l10n.email,
                           value: _display(_correo),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.phone_outlined,
-                          title: 'Teléfono',
+                          title: l10n.phone,
                           value: _display(_telefono),
                           isTablet: isTablet,
                           isDark: isDark,
@@ -460,24 +465,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: isTablet ? 24 : 16),
 
                         // ------- Ubicación -------
-                        _buildSectionTitle('Ubicación', isDark),
+                        _buildSectionTitle(l10n.location, isDark),
                         _buildReadOnlyTile(
                           icon: Icons.map_outlined,
-                          title: 'Región',
+                          title: l10n.region,
                           value: _display(_regionName),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.location_city_outlined,
-                          title: 'Comuna',
+                          title: l10n.commune,
                           value: _display(_comunaName),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildReadOnlyTile(
                           icon: Icons.place_outlined,
-                          title: 'Dirección',
+                          title: l10n.address,
                           value: _display(_direccion),
                           isTablet: isTablet,
                           isDark: isDark,
@@ -489,7 +494,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildSectionTitle('Registro SAG', isDark),
                         _buildReadOnlyTile(
                           icon: Icons.numbers_outlined,
-                          title: 'N° de Registro de Apicultor/a en el SAG',
+                          title: l10n.sagRegistryNumber,
                           value: _display(_sagRegistro),
                           isTablet: isTablet,
                           isDark: isDark,
@@ -498,22 +503,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: isTablet ? 24 : 16),
 
                         // ------- Seguridad -------
-                        _buildSectionTitle('Seguridad', isDark),
+                        _buildSectionTitle(l10n.security, isDark),
                         _buildActionTile(
                           icon: Icons.lock_outline_rounded,
-                          title: 'Cambiar contraseña',
-                          subtitle: 'Actualiza tu contraseña',
+                          title: l10n.changePassword,
+                          subtitle: l10n.changePasswordSubtitle,
                           onTap: () =>
-                              _showErrorMessage('Funcionalidad en desarrollo'),
+                              _showErrorMessage(l10n.featureInDevelopment),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildActionTile(
                           icon: Icons.verified_user_outlined,
-                          title: 'Autenticación en dos pasos',
-                          subtitle: 'Añade una capa extra de seguridad',
+                          title: l10n.twoFactorAuth,
+                          subtitle: l10n.twoFactorAuthSubtitle,
                           onTap: () =>
-                              _showErrorMessage('Funcionalidad en desarrollo'),
+                              _showErrorMessage(l10n.featureInDevelopment),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
@@ -521,22 +526,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: isTablet ? 24 : 16),
 
                         // ------- Preferencias -------
-                        _buildSectionTitle('Preferencias', isDark),
+                        _buildSectionTitle(l10n.preferences, isDark),
                         _buildActionTile(
                           icon: Icons.language_rounded,
-                          title: 'Idioma',
-                          subtitle: 'Español',
+                          title: l10n.language,
+                          subtitle: Provider.of<LocaleProvider>(
+                            context,
+                          ).getLanguageName(),
                           onTap: () =>
-                              _showErrorMessage('Funcionalidad en desarrollo'),
+                              _showErrorMessage(l10n.featureInDevelopment),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
                         _buildActionTile(
                           icon: Icons.storage_rounded,
-                          title: 'Gestión de datos',
-                          subtitle: 'Historial y almacenamiento',
+                          title: l10n.dataManagement,
+                          subtitle: l10n.dataManagementSubtitle,
                           onTap: () =>
-                              _showErrorMessage('Funcionalidad en desarrollo'),
+                              _showErrorMessage(l10n.featureInDevelopment),
                           isTablet: isTablet,
                           isDark: isDark,
                         ),
@@ -544,31 +551,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: isTablet ? 24 : 16),
 
                         // ------- Suscripción -------
-                        _buildSectionTitle('Suscripción', isDark),
-                        _buildSubscriptionCard(isDark, isTablet),
+                        _buildSectionTitle(l10n.subscription, isDark),
+                        _buildSubscriptionCard(l10n, isDark, isTablet),
 
                         SizedBox(height: isTablet ? 24 : 16),
 
                         // ------- Cuenta -------
-                        _buildSectionTitle('Cuenta', isDark),
-                        _buildInfoCard(isDark, isTablet),
+                        _buildSectionTitle(l10n.account, isDark),
+                        _buildInfoCard(l10n, isDark, isTablet),
 
                         SizedBox(height: isTablet ? 32 : 24),
 
                         // ------- Acciones -------
                         _buildActionButton(
-                          text: 'Cerrar sesión',
+                          text: l10n.logout,
                           icon: Icons.logout_rounded,
                           color: Colors.orange,
-                          onTap: () => _showLogoutDialog(isDark),
+                          onTap: () => _showLogoutDialog(l10n, isDark),
                           isTablet: isTablet,
                         ),
                         SizedBox(height: isTablet ? 16 : 12),
                         _buildActionButton(
-                          text: 'Eliminar cuenta',
+                          text: l10n.deleteAccount,
                           icon: Icons.delete_forever_rounded,
                           color: Colors.red,
-                          onTap: () => _showDeleteAccountDialog(isDark),
+                          onTap: () => _showDeleteAccountDialog(l10n, isDark),
                           isTablet: isTablet,
                         ),
                       ],
@@ -583,7 +590,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ------------------------------
   // Widgets de UI
   // ------------------------------
-  Widget _buildProfileHeader(bool isDark, bool isTablet) {
+  Widget _buildProfileHeader(
+    AppLocalizations l10n,
+    bool isDark,
+    bool isTablet,
+  ) {
     final nameForHeader = _display(_nombres);
     final emailForHeader = _display(_correo);
 
@@ -821,7 +832,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSubscriptionCard(bool isDark, bool isTablet) {
+  Widget _buildSubscriptionCard(
+    AppLocalizations l10n,
+    bool isDark,
+    bool isTablet,
+  ) {
     return Card(
       color: isDark
           ? Colors.white.withValues(alpha: 0.05)
@@ -864,7 +879,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Plan Gratuito',
+                        l10n.freePlan,
                         style: TextStyle(
                           fontSize: isTablet ? 18 : 16,
                           fontWeight: FontWeight.bold,
@@ -874,7 +889,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       Text(
-                        'Actualiza para más funciones',
+                        l10n.upgradeForMore,
                         style: TextStyle(
                           fontSize: isTablet ? 12 : 11,
                           color: isDark
@@ -891,8 +906,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () =>
-                    _showErrorMessage('Funcionalidad en desarrollo'),
+                onPressed: () => _showErrorMessage(l10n.featureInDevelopment),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2f43a7),
                   foregroundColor: Colors.white,
@@ -902,7 +916,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 child: Text(
-                  'Ver planes Premium',
+                  l10n.viewPremiumPlans,
                   style: TextStyle(
                     fontSize: isTablet ? 15 : 13,
                     fontWeight: FontWeight.w600,
@@ -916,7 +930,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildInfoCard(bool isDark, bool isTablet) {
+  Widget _buildInfoCard(AppLocalizations l10n, bool isDark, bool isTablet) {
     return Card(
       color: isDark
           ? Colors.white.withValues(alpha: 0.05)
@@ -937,7 +951,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             _buildInfoRow(
-              'Miembro desde',
+              l10n.memberSince,
               _formatDateDMY(_memberSince),
               Icons.calendar_today_rounded,
               isDark,
@@ -950,8 +964,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   : Colors.grey[300],
             ),
             _buildInfoRow(
-              'ID de usuario',
-              '—', // muestra si tu /user trae 'id'
+              l10n.userId,
+              l10n.notAvailable,
               Icons.fingerprint_rounded,
               isDark,
               isTablet,
@@ -1067,7 +1081,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ------------------------------
   // Diálogos (logout / eliminar)
   // ------------------------------
-  void _showLogoutDialog(bool isDark) {
+  void _showLogoutDialog(AppLocalizations l10n, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1081,7 +1095,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Cerrar sesión',
+              l10n.logout,
               style: TextStyle(
                 color: isDark ? Colors.white : const Color(0xFF2f43a7),
                 fontWeight: FontWeight.bold,
@@ -1090,7 +1104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         content: Text(
-          '¿Estás seguro de que deseas cerrar sesión?',
+          l10n.logoutConfirm,
           style: TextStyle(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.8)
@@ -1101,7 +1115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancelar',
+              l10n.cancel,
               style: TextStyle(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.7)
@@ -1136,14 +1150,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Cerrar sesión'),
+            child: Text(l10n.logout),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteAccountDialog(bool isDark) {
+  void _showDeleteAccountDialog(AppLocalizations l10n, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1158,7 +1172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Eliminar cuenta',
+                l10n.deleteAccount,
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF2f43a7),
                   fontWeight: FontWeight.bold,
@@ -1168,7 +1182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         content: Text(
-          'Esta acción es irreversible. Se eliminarán todos tus datos y conversaciones.',
+          l10n.deleteAccountConfirm,
           style: TextStyle(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.8)
@@ -1179,7 +1193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancelar',
+              l10n.cancel,
               style: TextStyle(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.7)
@@ -1190,7 +1204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _showErrorMessage('Funcionalidad en desarrollo');
+              _showErrorMessage(l10n.featureInDevelopment);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.withValues(alpha: 0.8),
@@ -1199,7 +1213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Eliminar'),
+            child: Text(l10n.delete),
           ),
         ],
       ),

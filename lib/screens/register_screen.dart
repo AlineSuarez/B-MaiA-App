@@ -1,8 +1,8 @@
-// lib/screens/register_screen.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_localizations.dart';
 import '../widgets/custom_text_field.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
@@ -79,30 +79,30 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   Future<void> _handleEmailRegister() async {
+    final l10n = AppLocalizations.of(context)!;
+
     // Validaciones de UI
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
-      return _showErrorMessage('Por favor, completa todos los campos');
+      return _showErrorMessage(l10n.requiredFields);
     }
     if (_nameController.text.trim().length < 3) {
-      return _showErrorMessage('El nombre debe tener al menos 3 caracteres');
+      return _showErrorMessage('Name must be at least 3 characters long');
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(_emailController.text.trim())) {
-      return _showErrorMessage('Ingresa un correo electrónico válido');
+      return _showErrorMessage(l10n.invalidEmail);
     }
     if (_passwordController.text.length < 6) {
-      return _showErrorMessage(
-        'La contraseña debe tener al menos 6 caracteres',
-      );
+      return _showErrorMessage(l10n.passwordTooShort(6));
     }
     if (_passwordController.text != _confirmPasswordController.text) {
-      return _showErrorMessage('Las contraseñas no coinciden');
+      return _showErrorMessage(l10n.passwordMismatch);
     }
     if (!_acceptTerms) {
-      return _showErrorMessage('Debes aceptar los términos y condiciones');
+      return _showErrorMessage(l10n.acceptTerms);
     }
 
     setState(() => _isLoadingEmail = true);
@@ -126,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       if (data['user'] != null) {
         await prefs.setString('me', jsonEncode(data['user']));
       } else {
-        // Si por alguna razón el endpoint no devuelve user, ‘me’ lo trae:
+        // Si por alguna razón el endpoint no devuelve user, 'me' lo trae:
         final me = await _auth.me();
         await prefs.setString('me', jsonEncode(me));
       }
@@ -134,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('¡Registro exitoso!')));
+      ).showSnackBar(SnackBar(content: Text(l10n.registerSuccess)));
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
@@ -146,10 +146,14 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   Future<void> _handleGoogleRegister() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isLoadingGoogle = true);
     // Aquí iría tu flujo de Google Sign-In si lo integras luego
     await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) setState(() => _isLoadingGoogle = false);
+    if (mounted) {
+      setState(() => _isLoadingGoogle = false);
+      _showErrorMessage(l10n.featureInDevelopment);
+    }
   }
 
   void _showErrorMessage(String message) {
@@ -168,6 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final media = MediaQuery.of(context);
     final screenWidth = media.size.width;
     final screenHeight = media.size.height;
@@ -210,13 +215,13 @@ class _RegisterScreenState extends State<RegisterScreen>
                       children: [
                         _buildLogoSection(logoSize, isTablet),
                         SizedBox(height: isTablet ? 32 : 24),
-                        _buildTitle(isTablet),
+                        _buildTitle(l10n, isTablet),
                         SizedBox(height: isTablet ? 32 : 24),
-                        _buildRegisterForm(isTablet),
+                        _buildRegisterForm(l10n, isTablet),
                         SizedBox(height: isTablet ? 24 : 20),
-                        _buildGoogleRegisterButton(isTablet),
+                        _buildGoogleRegisterButton(l10n, isTablet),
                         SizedBox(height: isTablet ? 20 : 16),
-                        _buildFooter(isTablet),
+                        _buildFooter(l10n, isTablet),
                       ],
                     ),
                   ),
@@ -253,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                               children: [
                                 _buildLogoSection(logoSize, isTablet),
                                 SizedBox(height: isTablet ? 24 : 18),
-                                Flexible(child: _buildTitle(isTablet)),
+                                Flexible(child: _buildTitle(l10n, isTablet)),
                               ],
                             ),
                           ),
@@ -354,13 +359,13 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  Widget _buildTitle(bool isTablet) {
+  Widget _buildTitle(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
         children: [
           Text(
-            'Crear Cuenta',
+            l10n.createAccount,
             style: TextStyle(
               fontSize: isTablet ? 28 : 22,
               fontWeight: FontWeight.bold,
@@ -371,7 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           ),
           SizedBox(height: isTablet ? 8 : 6),
           Text(
-            'Únete a B-MaiA y comienza tu experiencia',
+            l10n.joinBMaia,
             style: TextStyle(
               fontSize: isTablet ? 14 : 12,
               color: Colors.white.withValues(alpha: 0.7),
@@ -384,7 +389,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  Widget _buildRegisterForm(bool isTablet) {
+  Widget _buildRegisterForm(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -392,7 +397,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           CustomTextField(
             controller: _nameController,
             focusNode: _nameFocus,
-            hintText: 'Nombre completo',
+            hintText: l10n.fullName,
             keyboardType: TextInputType.name,
             prefixIcon: Icons.person_outline_rounded,
             isTablet: isTablet,
@@ -402,7 +407,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           CustomTextField(
             controller: _emailController,
             focusNode: _emailFocus,
-            hintText: 'Correo electrónico',
+            hintText: l10n.email,
             keyboardType: TextInputType.emailAddress,
             prefixIcon: Icons.email_outlined,
             isTablet: isTablet,
@@ -412,7 +417,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           CustomTextField(
             controller: _passwordController,
             focusNode: _passwordFocus,
-            hintText: 'Contraseña',
+            hintText: l10n.password,
             obscureText: !_isPasswordVisible,
             prefixIcon: Icons.lock_outline_rounded,
             isTablet: isTablet,
@@ -433,7 +438,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           CustomTextField(
             controller: _confirmPasswordController,
             focusNode: _confirmPasswordFocus,
-            hintText: 'Confirmar contraseña',
+            hintText: l10n.confirmPassword,
             obscureText: !_isConfirmPasswordVisible,
             prefixIcon: Icons.lock_outline_rounded,
             isTablet: isTablet,
@@ -452,7 +457,7 @@ class _RegisterScreenState extends State<RegisterScreen>
             onSubmitted: (_) => _handleEmailRegister(),
           ),
           SizedBox(height: isTablet ? 16 : 12),
-          _buildTermsCheckbox(isTablet),
+          _buildTermsCheckbox(l10n, isTablet),
           SizedBox(height: isTablet ? 24 : 20),
           SizedBox(
             width: double.infinity,
@@ -478,7 +483,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                     )
                   : Text(
-                      'Registrarse',
+                      l10n.register,
                       style: TextStyle(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
@@ -492,7 +497,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  Widget _buildTermsCheckbox(bool isTablet) {
+  Widget _buildTermsCheckbox(AppLocalizations l10n, bool isTablet) {
     return Row(
       children: [
         SizedBox(
@@ -516,7 +521,9 @@ class _RegisterScreenState extends State<RegisterScreen>
           child: Wrap(
             children: [
               Text(
-                'Acepto los ',
+                l10n
+                    .acceptTermsMessage(l10n.termsAndConditions)
+                    .split(l10n.termsAndConditions)[0],
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.7),
                   fontSize: isTablet ? 12 : 11,
@@ -525,12 +532,11 @@ class _RegisterScreenState extends State<RegisterScreen>
               GestureDetector(
                 onTap: () {},
                 child: Text(
-                  'términos y condiciones',
+                  l10n.termsAndConditions,
                   style: TextStyle(
                     color: const Color(0xFF4a5bb8),
                     fontSize: isTablet ? 12 : 11,
                     fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),
@@ -541,7 +547,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  Widget _buildGoogleRegisterButton(bool isTablet) {
+  Widget _buildGoogleRegisterButton(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -552,7 +558,7 @@ class _RegisterScreenState extends State<RegisterScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'o regístrate con',
+                  l10n.orWord,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: isTablet ? 12 : 11,
@@ -600,7 +606,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Continuar con Google',
+                          l10n.continueWithGoogle,
                           style: TextStyle(
                             fontSize: isTablet ? 14 : 13,
                             fontWeight: FontWeight.w600,
@@ -627,19 +633,20 @@ class _RegisterScreenState extends State<RegisterScreen>
     ),
   );
 
-  Widget _buildFooter(bool isTablet) {
+  Widget _buildFooter(AppLocalizations l10n, bool isTablet) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '¿Ya tienes cuenta? ',
+            l10n.alreadyHaveAccount,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.7),
               fontSize: isTablet ? 12 : 11,
             ),
           ),
+          const SizedBox(width: 2),
           TextButton(
             onPressed: _handleBackButton,
             style: TextButton.styleFrom(
@@ -648,7 +655,7 @@ class _RegisterScreenState extends State<RegisterScreen>
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              'Inicia sesión',
+              l10n.login,
               style: TextStyle(
                 color: const Color(0xFF4a5bb8),
                 fontSize: isTablet ? 12 : 11,

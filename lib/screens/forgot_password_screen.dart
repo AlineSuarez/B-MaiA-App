@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../widgets/custom_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -64,15 +65,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   }
 
   Future<void> _handleResetPassword() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_emailController.text.isEmpty) {
-      _showErrorMessage('Por favor, ingresa tu correo electrónico');
+      _showErrorMessage('Please enter your email');
       return;
     }
 
     // Validación básica de email
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(_emailController.text)) {
-      _showErrorMessage('Por favor, ingresa un correo electrónico válido');
+      _showErrorMessage(l10n.invalidEmail);
       return;
     }
 
@@ -88,7 +91,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       _emailSent = true;
     });
 
-    _showSuccessMessage('Correo enviado. Revisa tu bandeja de entrada');
+    _showSuccessMessage(l10n.emailSent);
   }
 
   void _showErrorMessage(String message) {
@@ -121,6 +124,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final media = MediaQuery.of(context);
     final screenWidth = media.size.width;
     final screenHeight = media.size.height;
@@ -176,11 +180,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                                 children: [
                                   _buildLogoSection(logoSize, isTablet),
                                   SizedBox(height: isTablet ? 32 : 24),
-                                  _buildTitle(isTablet),
+                                  _buildTitle(l10n, isTablet),
                                   SizedBox(height: isTablet ? 32 : 24),
                                   _emailSent
-                                      ? _buildSuccessView(isTablet)
-                                      : _buildFormView(isTablet),
+                                      ? _buildSuccessView(l10n, isTablet)
+                                      : _buildFormView(l10n, isTablet),
                                 ],
                               ),
                             ),
@@ -211,7 +215,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                               children: [
                                 _buildLogoSection(logoSize, isTablet),
                                 SizedBox(height: isTablet ? 24 : 18),
-                                _buildTitle(isTablet),
+                                _buildTitle(l10n, isTablet),
                               ],
                             ),
                           ),
@@ -233,8 +237,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                                 vertical: verticalPadding,
                               ),
                               child: _emailSent
-                                  ? _buildSuccessView(isTablet)
-                                  : _buildFormView(isTablet),
+                                  ? _buildSuccessView(l10n, isTablet)
+                                  : _buildFormView(l10n, isTablet),
                             ),
                           ),
                         ),
@@ -320,13 +324,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     );
   }
 
-  Widget _buildTitle(bool isTablet) {
+  Widget _buildTitle(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
         children: [
           Text(
-            _emailSent ? '¡Correo Enviado!' : '¿Olvidaste tu contraseña?',
+            _emailSent ? l10n.emailSent : l10n.forgotPasswordTitle,
             style: TextStyle(
               fontSize: isTablet ? 28 : 22,
               fontWeight: FontWeight.bold,
@@ -337,9 +341,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           ),
           SizedBox(height: isTablet ? 8 : 6),
           Text(
-            _emailSent
-                ? 'Revisa tu correo para restablecer tu contraseña'
-                : 'Ingresa tu correo y te enviaremos instrucciones para recuperarla',
+            l10n.forgotPasswordSubtitle,
             style: TextStyle(
               fontSize: isTablet ? 14 : 12,
               color: Colors.white.withValues(alpha: 0.7),
@@ -352,7 +354,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     );
   }
 
-  Widget _buildFormView(bool isTablet) {
+  Widget _buildFormView(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -360,7 +362,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           CustomTextField(
             controller: _emailController,
             focusNode: _emailFocus,
-            hintText: 'Correo electrónico',
+            hintText: l10n.email,
             keyboardType: TextInputType.emailAddress,
             prefixIcon: Icons.email_outlined,
             isTablet: isTablet,
@@ -391,7 +393,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       ),
                     )
                   : Text(
-                      'Enviar Instrucciones',
+                      l10n.sendInstructions,
                       style: TextStyle(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
@@ -411,9 +413,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                   size: isTablet ? 16 : 14,
                   color: const Color(0xFF4a5bb8),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Volver al inicio de sesión',
+                  l10n.backToLogin,
                   style: TextStyle(
                     color: const Color(0xFF4a5bb8),
                     fontSize: isTablet ? 13 : 12,
@@ -428,7 +430,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     );
   }
 
-  Widget _buildSuccessView(bool isTablet) {
+  Widget _buildSuccessView(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -450,7 +452,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           ),
           SizedBox(height: isTablet ? 24 : 20),
           Text(
-            'Hemos enviado un correo a:',
+            'Email sent to:',
             style: TextStyle(
               fontSize: isTablet ? 14 : 12,
               color: Colors.white.withValues(alpha: 0.7),
@@ -486,7 +488,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
               ),
               child: Text(
-                'Reenviar Correo',
+                l10n.resendEmail,
                 style: TextStyle(
                   fontSize: isTablet ? 16 : 14,
                   fontWeight: FontWeight.w600,
@@ -506,9 +508,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                   size: isTablet ? 16 : 14,
                   color: const Color(0xFF4a5bb8),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Volver al inicio de sesión',
+                  l10n.backToLogin,
                   style: TextStyle(
                     color: const Color(0xFF4a5bb8),
                     fontSize: isTablet ? 13 : 12,

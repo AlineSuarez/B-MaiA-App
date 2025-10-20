@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
 import 'login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -13,29 +14,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingPage> _pages = [
-    OnboardingPage(
-      image: 'assets/images/home/apicultor.png',
-      title: '¡Bienvenido a B-MaiA!',
-      description:
-          'Descubre una nueva forma de gestionar tus proyectos con inteligencia artificial avanzada.',
-    ),
-    OnboardingPage(
-      image: 'assets/images/home/apicultor-2.png',
-      title: 'Tecnología Avanzada',
-      description:
-          'Utilizamos las últimas innovaciones en IA para brindarte la mejor experiencia posible.',
-    ),
-    OnboardingPage(
-      image: 'assets/images/home/apicultor-3.png',
-      title: 'Experiencia Personalizada',
-      description:
-          'Cada función está diseñada pensando en tus necesidades específicas y preferencias.',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    final List<OnboardingPage> pages = [
+      OnboardingPage(
+        image: 'assets/images/home/apicultor.png',
+        title: l10n.onboardingTitle1,
+        description: l10n.onboardingDesc1,
+      ),
+      OnboardingPage(
+        image: 'assets/images/home/apicultor-2.png',
+        title: l10n.onboardingTitle2,
+        description: l10n.onboardingDesc2,
+      ),
+      OnboardingPage(
+        image: 'assets/images/home/apicultor-3.png',
+        title: l10n.onboardingTitle3,
+        description: l10n.onboardingDesc3,
+      ),
+    ];
+
     final media = MediaQuery.of(context);
     final screenWidth = media.size.width;
     final screenHeight = media.size.height;
@@ -62,7 +62,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if (_currentPage < _pages.length - 1)
+                    if (_currentPage < pages.length - 1)
                       TextButton(
                         onPressed: () async {
                           final navigator = Navigator.of(context);
@@ -75,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           );
                         },
                         child: Text(
-                          'Omitir',
+                          l10n.skip,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 16,
@@ -96,10 +96,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       _currentPage = index;
                     });
                   },
-                  itemCount: _pages.length,
+                  itemCount: pages.length,
                   itemBuilder: (context, index) {
                     return _buildResponsivePage(
-                      _pages[index],
+                      pages[index],
                       isTablet,
                       screenWidth,
                       screenHeight,
@@ -115,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    _pages.length,
+                    pages.length,
                     (index) => _buildPageIndicator(index),
                   ),
                 ),
@@ -133,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: isTablet ? 44 : 38,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (_currentPage < _pages.length - 1) {
+                      if (_currentPage < pages.length - 1) {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
@@ -166,18 +166,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          _currentPage < _pages.length - 1
-                              ? 'Siguiente'
-                              : 'Comenzar',
+                          _currentPage < pages.length - 1
+                              ? l10n.next
+                              : l10n.getStarted,
                           style: TextStyle(
                             fontSize: isTablet ? 16 : 13,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Icon(
-                          _currentPage < _pages.length - 1
+                          _currentPage < pages.length - 1
                               ? Icons.arrow_forward_rounded
                               : Icons.check_circle_rounded,
                           size: isTablet ? 22 : 18,
@@ -203,12 +203,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     double screenHeight,
     bool isLandscape,
   ) {
-    final imageMaxWidth = isTablet
-        ? 480.0
-        : screenWidth * 0.75; // Antes: 350.0 / 0.5
-    final imageMaxHeight = isTablet
-        ? 340.0
-        : screenHeight * 0.45; // Antes: 250.0 / 0.35
+    final imageMaxWidth = isTablet ? 480.0 : screenWidth * 0.75;
+    final imageMaxHeight = isTablet ? 340.0 : screenHeight * 0.45;
     final textMaxWidth = isTablet ? 450.0 : screenWidth * 0.7;
 
     if (!isLandscape) {

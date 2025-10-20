@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'providers/theme_provider.dart';
 import 'providers/chat_provider.dart';
-import 'providers/voice_provider.dart'; // <-- AÑADIDO
-
+import 'providers/locale_provider.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
-
 import 'services/api_client.dart';
 import 'services/auth_service.dart';
 
@@ -42,6 +41,7 @@ class MyApp extends StatelessWidget {
       await AuthService().me(); // 200 OK => token válido
       return const HomeScreen();
     } catch (_) {
+      // token inválido / expirado -> limpiamos y vamos a login
       await ApiClient().clearToken();
       await prefs.setBool('isLoggedIn', false);
       return const LoginScreen();
@@ -50,22 +50,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Instancia que usaremos también en VoiceProvider
-    final apiClient = ApiClient();
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
-        ChangeNotifierProvider(
-          create: (_) => VoiceProvider(apiClient: apiClient), // <-- AÑADIDO
-        ),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, child) {
           return MaterialApp(
-            title: 'B-MaiA App',
+            title: 'B-MaiA',
             debugShowCheckedModeBanner: false,
+            locale: localeProvider.locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('es'), Locale('en')],
             theme: ThemeData(
               brightness: Brightness.light,
               scaffoldBackgroundColor: Colors.white,

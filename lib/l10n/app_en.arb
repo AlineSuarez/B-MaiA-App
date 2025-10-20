@@ -1,0 +1,1046 @@
+{
+  "@@locale": "en",
+  "appName": "B-MaiA",
+  "@appName": {
+    "description": "Application name"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Generic error label"
+  },
+  "success": "Éxito",
+  "@success": {
+    "description": "Generic success message"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "accept": "Accept",
+  "@accept": {
+    "description": "Accept button label"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button label"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button label"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button label"
+  },
+  "previous": "Previous",
+  "@previous": {
+    "description": "Previous button label"
+  },
+  "finish": "Finish",
+  "@finish": {
+    "description": "Finish button label"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button label"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button label"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search field placeholder"
+  },
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter button label"
+  },
+  "sort": "Sort",
+  "@sort": {
+    "description": "Sort button label"
+  },
+  "more": "More",
+  "@more": {
+    "description": "More options label"
+  },
+  "less": "Less",
+  "@less": {
+    "description": "Less options label"
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes confirmation label"
+  },
+  "no": "No",
+  "@no": {
+    "description": "No confirmation label"
+  },
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "General welcome message"
+  },
+  "welcomeUser": "Welcome, {name}",
+  "@welcomeUser": {
+    "description": "Personalized welcome message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Mary"
+      }
+    }
+  },
+  "welcomeBack": "Welcome back, {name}!",
+  "@welcomeBack": {
+    "description": "Welcome back message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Mary"
+      }
+    }
+  },
+  "signInToContinue": "Sign in to continue with B-MaiA",
+  "@signInToContinue": {
+    "description": "Sign in subtitle message"
+  },
+  "login": "Sign in",
+  "@login": {
+    "description": "Login button label"
+  },
+  "loginSuccess": "Sign in successful!",
+  "@loginSuccess": {
+    "description": "Login success message"
+  },
+  "logout": "Sign out",
+  "@logout": {
+    "description": "Logout button label"
+  },
+  "logoutConfirm": "Are you sure you want to sign out?",
+  "@logoutConfirm": {
+    "description": "Logout confirmation message"
+  },
+  "register": "Sign up",
+  "@register": {
+    "description": "Register button label"
+  },
+  "registerNow": "Sign up now",
+  "@registerNow": {
+    "description": "Register call to action"
+  },
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account title"
+  },
+  "joinBMaia": "Join B-MaiA and start your experience",
+  "@joinBMaia": {
+    "description": "Registration subtitle"
+  },
+  "registerSuccess": "Registration successful!",
+  "@registerSuccess": {
+    "description": "Registration success message"
+  },
+  "alreadyHaveAccount": "Already have an account?",
+  "@alreadyHaveAccount": {
+    "description": "Already have account message"
+  },
+  "noAccount": "Don't have an account?",
+  "@noAccount": {
+    "description": "No account message"
+  },
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Sign in link label"
+  },
+  "signUp": "Sign up",
+  "@signUp": {
+    "description": "Sign up link label"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "emailPlaceholder": "Enter your email",
+  "@emailPlaceholder": {
+    "description": "Email field placeholder"
+  },
+  "emailHint": "example@email.com",
+  "@emailHint": {
+    "description": "Email field hint"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "passwordPlaceholder": "Enter your password",
+  "@passwordPlaceholder": {
+    "description": "Password field placeholder"
+  },
+  "confirmPassword": "Confirm password",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+  "confirmPasswordPlaceholder": "Confirm your password",
+  "@confirmPasswordPlaceholder": {
+    "description": "Confirm password field placeholder"
+  },
+  "newPassword": "New password",
+  "@newPassword": {
+    "description": "New password field label"
+  },
+  "currentPassword": "Current password",
+  "@currentPassword": {
+    "description": "Current password field label"
+  },
+  "fullName": "Full name",
+  "@fullName": {
+    "description": "Full name field label"
+  },
+  "firstName": "First name",
+  "@firstName": {
+    "description": "First name field label"
+  },
+  "lastName": "Last name",
+  "@lastName": {
+    "description": "Last name field label"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone field label"
+  },
+  "address": "Address",
+  "@address": {
+    "description": "Address field label"
+  },
+  "region": "Region",
+  "@region": {
+    "description": "Region field label"
+  },
+  "commune": "Commune",
+  "@commune": {
+    "description": "Commune field label"
+  },
+  "rut": "RUT",
+  "@rut": {
+    "description": "RUT field label"
+  },
+  "businessName": "Business name",
+  "@businessName": {
+    "description": "Business name field label"
+  },
+  "sagRegistry": "SAG Beekeeper Registration Number",
+  "@sagRegistry": {
+    "description": "SAG registry field label"
+  },
+  "requiredField": "This field is required",
+  "@requiredField": {
+    "description": "Required field validation message"
+  },
+  "requiredFields": "Please fill in all fields",
+  "@requiredFields": {
+    "description": "All required fields validation message"
+  },
+  "invalidEmail": "Enter a valid email address",
+  "@invalidEmail": {
+    "description": "Invalid email validation message"
+  },
+  "invalidEmailFormat": "Please enter a valid email address",
+  "@invalidEmailFormat": {
+    "description": "Invalid email format validation message"
+  },
+  "passwordTooShort": "Password must be at least {count} characters",
+  "@passwordTooShort": {
+    "description": "Password too short validation message",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "passwordMismatch": "Passwords do not match",
+  "@passwordMismatch": {
+    "description": "Password mismatch validation message"
+  },
+  "nameTooShort": "Name must be at least {count} characters",
+  "@nameTooShort": {
+    "description": "Name too short validation message",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "acceptTerms": "You must accept the terms and conditions",
+  "@acceptTerms": {
+    "description": "Accept terms validation message"
+  },
+  "forgotPassword": "Forgot your password?",
+  "@forgotPassword": {
+    "description": "Forgot password link label"
+  },
+  "forgotPasswordTitle": "Forgot your password?",
+  "@forgotPasswordTitle": {
+    "description": "Forgot password screen title"
+  },
+  "forgotPasswordSubtitle": "Enter your email and we'll send you instructions to recover it",
+  "@forgotPasswordSubtitle": {
+    "description": "Forgot password screen subtitle"
+  },
+  "resetPassword": "Reset password",
+  "@resetPassword": {
+    "description": "Reset password button label"
+  },
+  "sendInstructions": "Send Instructions",
+  "@sendInstructions": {
+    "description": "Send instructions button label"
+  },
+  "emailSent": "Email Sent!",
+  "@emailSent": {
+    "description": "Email sent confirmation message"
+  },
+  "emailSentMessage": "Check your email to reset your password",
+  "@emailSentMessage": {
+    "description": "Email sent detailed message"
+  },
+  "emailSentTitle": "Check your email",
+  "@emailSentTitle": {
+    "description": "Email sent screen title"
+  },
+  "checkEmailMessage": "We've sent you instructions to reset your password",
+  "@checkEmailMessage": {
+    "description": "Check email message"
+  },
+  "emailSentTo": "We've sent an email to:",
+  "@emailSentTo": {
+    "description": "Email sent to prefix"
+  },
+  "resendEmail": "Resend Email",
+  "@resendEmail": {
+    "description": "Resend email button label"
+  },
+  "backToLogin": "Back to sign in",
+  "@backToLogin": {
+    "description": "Back to login link label"
+  },
+  "enterEmail": "Please enter your email",
+  "@enterEmail": {
+    "description": "Enter email validation message"
+  },
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Google sign in button label"
+  },
+  "orContinueWith": "or continue with",
+  "@orContinueWith": {
+    "description": "Alternative sign in separator"
+  },
+  "orRegisterWith": "or register with",
+  "@orRegisterWith": {
+    "description": "Alternative registration separator"
+  },
+  "googleTokenError": "Could not get Google authentication token",
+  "@googleTokenError": {
+    "description": "Google token error message"
+  },
+  "termsAndConditions": "terms and conditions",
+  "@termsAndConditions": {
+    "description": "Terms and conditions link text"
+  },
+  "acceptTermsMessage": "I accept the {terms}",
+  "@acceptTermsMessage": {
+    "description": "Accept terms checkbox label",
+    "placeholders": {
+      "terms": {
+        "type": "String",
+        "example": "terms and conditions"
+      }
+    }
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "intelligentAssistant": "Intelligent assistant",
+  "@intelligentAssistant": {
+    "description": "AI assistant label"
+  },
+  "newConversation": "New conversation",
+  "@newConversation": {
+    "description": "New conversation button label"
+  },
+  "history": "History",
+  "@history": {
+    "description": "History label"
+  },
+  "clearChat": "Clear chat",
+  "@clearChat": {
+    "description": "Clear chat button label"
+  },
+  "clearChatConfirm": "Are you sure you want to delete all messages from this conversation?",
+  "@clearChatConfirm": {
+    "description": "Clear chat confirmation message"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button label"
+  },
+  "messageInputPlaceholder": "Type your message here...",
+  "@messageInputPlaceholder": {
+    "description": "Message input placeholder"
+  },
+  "typingIndicator": "B-MaiA is typing...",
+  "@typingIndicator": {
+    "description": "Typing indicator text"
+  },
+  "sendMessage": "Send message",
+  "@sendMessage": {
+    "description": "Send message button label"
+  },
+  "helloBMaia": "Hello! I'm B-MaiA",
+  "@helloBMaia": {
+    "description": "AI greeting message"
+  },
+  "aiAssistantDescription": "Your artificial intelligence assistant. Ask me anything you need, I'm here to help.",
+  "@aiAssistantDescription": {
+    "description": "AI assistant description"
+  },
+  "writeFirstQuestion": "Write your first question",
+  "@writeFirstQuestion": {
+    "description": "First question prompt"
+  },
+  "trySaying": "Try asking:",
+  "@trySaying": {
+    "description": "Suggestions header"
+  },
+  "howCanYouHelp": "How can you help me?",
+  "@howCanYouHelp": {
+    "description": "Suggestion 1"
+  },
+  "helpWithProgramming": "Help me with programming",
+  "@helpWithProgramming": {
+    "description": "Suggestion 2"
+  },
+  "explainConcept": "Explain a concept",
+  "@explainConcept": {
+    "description": "Suggestion 3"
+  },
+  "helpMeWrite": "Help me write",
+  "@helpMeWrite": {
+    "description": "Suggestion 4"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Appearance section title"
+  },
+  "application": "Application",
+  "@application": {
+    "description": "Application section title"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security section title"
+  },
+  "preferences": "Preferences",
+  "@preferences": {
+    "description": "Preferences section title"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Account section title"
+  },
+  "subscription": "Subscription",
+  "@subscription": {
+    "description": "Subscription section title"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme setting label"
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Light theme option"
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Dark theme option"
+  },
+  "themeSystem": "Follow system",
+  "@themeSystem": {
+    "description": "System theme option"
+  },
+  "selectTheme": "Select theme",
+  "@selectTheme": {
+    "description": "Select theme dialog title"
+  },
+  "systemTheme": "System",
+  "@systemTheme": {
+    "description": "System theme label"
+  },
+  "systemThemeSubtitle": "Follow system",
+  "@systemThemeSubtitle": {
+    "description": "System theme subtitle"
+  },
+  "lightMode": "Light mode",
+  "@lightMode": {
+    "description": "Light mode label"
+  },
+  "lightModeSubtitle": "Force light mode",
+  "@lightModeSubtitle": {
+    "description": "Light mode subtitle"
+  },
+  "darkMode": "Dark mode",
+  "@darkMode": {
+    "description": "Dark mode label"
+  },
+  "darkModeSubtitle": "Force dark mode",
+  "@darkModeSubtitle": {
+    "description": "Dark mode subtitle"
+  },
+  "useSystemTheme": "Use system theme",
+  "@useSystemTheme": {
+    "description": "Use system theme option"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting label"
+  },
+  "selectLanguage": "Select app language",
+  "@selectLanguage": {
+    "description": "Select language dialog title"
+  },
+  "spanish": "Español",
+  "@spanish": {
+    "description": "Spanish language option"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language option"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications setting label"
+  },
+  "notificationsSubtitle": "Notification preferences",
+  "@notificationsSubtitle": {
+    "description": "Notifications subtitle"
+  },
+  "enableNotifications": "Enable notifications",
+  "@enableNotifications": {
+    "description": "Enable notifications toggle"
+  },
+  "notificationSettings": "Notification settings",
+  "@notificationSettings": {
+    "description": "Notification settings label"
+  },
+  "helpSupport": "Help and support",
+  "@helpSupport": {
+    "description": "Help and support label"
+  },
+  "helpSupportSubtitle": "Help center and contact",
+  "@helpSupportSubtitle": {
+    "description": "Help and support subtitle"
+  },
+  "helpCenter": "Help center",
+  "@helpCenter": {
+    "description": "Help center label"
+  },
+  "contactSupport": "Contact support",
+  "@contactSupport": {
+    "description": "Contact support label"
+  },
+  "faq": "Frequently asked questions",
+  "@faq": {
+    "description": "FAQ label"
+  },
+  "documentation": "Documentation",
+  "@documentation": {
+    "description": "Documentation label"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About label"
+  },
+  "aboutSubtitle": "Application information",
+  "@aboutSubtitle": {
+    "description": "About subtitle"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Version label"
+  },
+  "build": "Build",
+  "@build": {
+    "description": "Build label"
+  },
+  "termsOfService": "Terms of service",
+  "@termsOfService": {
+    "description": "Terms of service label"
+  },
+  "privacyPolicy": "Privacy policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy label"
+  },
+  "licenses": "Licenses",
+  "@licenses": {
+    "description": "Licenses label"
+  },
+  "profile": "My Profile",
+  "@profile": {
+    "description": "Profile label"
+  },
+  "myProfile": "My Profile",
+  "@myProfile": {
+    "description": "My profile screen title"
+  },
+  "editProfile": "Edit profile",
+  "@editProfile": {
+    "description": "Edit profile button label"
+  },
+  "personalInfo": "Personal Information",
+  "@personalInfo": {
+    "description": "Personal info section title"
+  },
+  "location": "Location",
+  "@location": {
+    "description": "Location section title"
+  },
+  "legalData": "Legal data",
+  "@legalData": {
+    "description": "Legal data section title"
+  },
+  "legalDataRut": "User or Legal Representative RUT",
+  "@legalDataRut": {
+    "description": "RUT field label in legal data"
+  },
+  "legalDataBusinessName": "Business name",
+  "@legalDataBusinessName": {
+    "description": "Business name field label in legal data"
+  },
+  "sagRegistryNumber": "SAG Beekeeper Registration Number",
+  "@sagRegistryNumber": {
+    "description": "SAG registry number field label"
+  },
+  "memberSince": "Member since",
+  "@memberSince": {
+    "description": "Member since label"
+  },
+  "userId": "User ID",
+  "@userId": {
+    "description": "User ID label"
+  },
+  "profilePicture": "Profile picture",
+  "@profilePicture": {
+    "description": "Profile picture label"
+  },
+  "selectPhoto": "Select photo",
+  "@selectPhoto": {
+    "description": "Select photo dialog title"
+  },
+  "takePhoto": "Take photo",
+  "@takePhoto": {
+    "description": "Take photo option"
+  },
+  "chooseFromGallery": "Choose from gallery",
+  "@chooseFromGallery": {
+    "description": "Choose from gallery option"
+  },
+  "removePhoto": "Remove photo",
+  "@removePhoto": {
+    "description": "Remove photo option"
+  },
+  "photoSelected": "Photo selected (preview)",
+  "@photoSelected": {
+    "description": "Photo selected confirmation"
+  },
+  "photoRemoved": "Photo removed (preview)",
+  "@photoRemoved": {
+    "description": "Photo removed confirmation"
+  },
+  "changePassword": "Change password",
+  "@changePassword": {
+    "description": "Change password label"
+  },
+  "changePasswordSubtitle": "Update your password",
+  "@changePasswordSubtitle": {
+    "description": "Change password subtitle"
+  },
+  "twoFactorAuth": "Two-factor authentication",
+  "@twoFactorAuth": {
+    "description": "Two-factor authentication label"
+  },
+  "twoFactorAuthSubtitle": "Add an extra layer of security",
+  "@twoFactorAuthSubtitle": {
+    "description": "Two-factor authentication subtitle"
+  },
+  "securitySettings": "Security settings",
+  "@securitySettings": {
+    "description": "Security settings label"
+  },
+  "languageSettings": "Language",
+  "@languageSettings": {
+    "description": "Language settings label"
+  },
+  "languageSubtitle": "English",
+  "@languageSubtitle": {
+    "description": "Language subtitle"
+  },
+  "dataManagement": "Data management",
+  "@dataManagement": {
+    "description": "Data management label"
+  },
+  "dataManagementSubtitle": "History and storage",
+  "@dataManagementSubtitle": {
+    "description": "Data management subtitle"
+  },
+  "storageManagement": "Storage management",
+  "@storageManagement": {
+    "description": "Storage management label"
+  },
+  "clearCache": "Clear cache",
+  "@clearCache": {
+    "description": "Clear cache button label"
+  },
+  "clearHistory": "Clear history",
+  "@clearHistory": {
+    "description": "Clear history button label"
+  },
+  "freePlan": "Free Plan",
+  "@freePlan": {
+    "description": "Free plan label"
+  },
+  "premiumPlan": "Premium Plan",
+  "@premiumPlan": {
+    "description": "Premium plan label"
+  },
+  "upgradePlan": "Upgrade plan",
+  "@upgradePlan": {
+    "description": "Upgrade plan button label"
+  },
+  "upgradeForMore": "Upgrade for more features",
+  "@upgradeForMore": {
+    "description": "Upgrade plan subtitle"
+  },
+  "viewPremiumPlans": "View Premium plans",
+  "@viewPremiumPlans": {
+    "description": "View premium plans button label"
+  },
+  "currentPlan": "Current plan",
+  "@currentPlan": {
+    "description": "Current plan label"
+  },
+  "billing": "Billing",
+  "@billing": {
+    "description": "Billing label"
+  },
+  "paymentMethod": "Payment method",
+  "@paymentMethod": {
+    "description": "Payment method label"
+  },
+  "deleteAccount": "Delete account",
+  "@deleteAccount": {
+    "description": "Delete account button label"
+  },
+  "deleteAccountConfirm": "This action is irreversible. All your data and conversations will be deleted.",
+  "@deleteAccountConfirm": {
+    "description": "Delete account confirmation message"
+  },
+  "accountDeleted": "Account deleted",
+  "@accountDeleted": {
+    "description": "Account deleted confirmation"
+  },
+  "welcomeToBMaia": "Welcome to B-MaiA!",
+  "@welcomeToBMaia": {
+    "description": "Welcome to B-MaiA message"
+  },
+  "onboardingTitle1": "Welcome to B-MaiA!",
+  "@onboardingTitle1": {
+    "description": "Onboarding screen 1 title"
+  },
+  "onboardingDesc1": "Discover a new way to manage your projects with advanced artificial intelligence.",
+  "@onboardingDesc1": {
+    "description": "Onboarding screen 1 description"
+  },
+  "onboardingTitle2": "Advanced Technology",
+  "@onboardingTitle2": {
+    "description": "Onboarding screen 2 title"
+  },
+  "onboardingDesc2": "We use the latest AI innovations to give you the best possible experience.",
+  "@onboardingDesc2": {
+    "description": "Onboarding screen 2 description"
+  },
+  "onboardingTitle3": "Personalized Experience",
+  "@onboardingTitle3": {
+    "description": "Onboarding screen 3 title"
+  },
+  "onboardingDesc3": "Every feature is designed with your specific needs and preferences in mind.",
+  "@onboardingDesc3": {
+    "description": "Onboarding screen 3 description"
+  },
+  "getStarted": "Get started",
+  "@getStarted": {
+    "description": "Get started button label"
+  },
+  "viewIntroduction": "View introduction",
+  "@viewIntroduction": {
+    "description": "View introduction button label"
+  },
+  "errorGeneric": "An error occurred",
+  "@errorGeneric": {
+    "description": "Generic error message"
+  },
+  "errorConnection": "Connection error",
+  "@errorConnection": {
+    "description": "Connection error message"
+  },
+  "errorTimeout": "Request timeout",
+  "@errorTimeout": {
+    "description": "Timeout error message"
+  },
+  "errorServer": "Server error",
+  "@errorServer": {
+    "description": "Server error message"
+  },
+  "errorNotFound": "Not found",
+  "@errorNotFound": {
+    "description": "Not found error message"
+  },
+  "errorUnauthorized": "Unauthorized",
+  "@errorUnauthorized": {
+    "description": "Unauthorized error message"
+  },
+  "errorForbidden": "Access denied",
+  "@errorForbidden": {
+    "description": "Forbidden error message"
+  },
+  "errorTryAgain": "Please try again",
+  "@errorTryAgain": {
+    "description": "Try again error message"
+  },
+  "errorImageSelection": "Error selecting image",
+  "@errorImageSelection": {
+    "description": "Image selection error message"
+  },
+  "featureInDevelopment": "Feature in development",
+  "@featureInDevelopment": {
+    "description": "Feature in development message"
+  },
+  "successGeneric": "Operation successful",
+  "@successGeneric": {
+    "description": "Generic success message"
+  },
+  "successSaved": "Saved successfully",
+  "@successSaved": {
+    "description": "Saved success message"
+  },
+  "successUpdated": "Updated successfully",
+  "@successUpdated": {
+    "description": "Updated success message"
+  },
+  "successDeleted": "Deleted successfully",
+  "@successDeleted": {
+    "description": "Deleted success message"
+  },
+  "successSent": "Sent successfully",
+  "@successSent": {
+    "description": "Sent success message"
+  },
+  "menu": "Menu",
+  "@menu": {
+    "description": "Menu label"
+  },
+  "chats": "Conversations",
+  "@chats": {
+    "description": "Conversations label"
+  },
+  "chatHistory": "{count, plural, =0{No conversations} =1{1 conversation} other{{count} conversations}}",
+  "@chatHistory": {
+    "description": "Chat history counter",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+  "myAccount": "My Account",
+  "@myAccount": {
+    "description": "My account label"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Chat label"
+  },
+  "message": "Message",
+  "@message": {
+    "description": "Message label"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages label"
+  },
+  "noMessages": "No messages",
+  "@noMessages": {
+    "description": "No messages label"
+  },
+  "typing": "Typing...",
+  "@typing": {
+    "description": "Typing indicator"
+  },
+  "online": "Online",
+  "@online": {
+    "description": "Online status"
+  },
+  "offline": "Offline",
+  "@offline": {
+    "description": "Offline status"
+  },
+  "lastSeen": "Last seen",
+  "@lastSeen": {
+    "description": "Last seen label"
+  },
+  "readBy": "Read by",
+  "@readBy": {
+    "description": "Read by label"
+  },
+  "deliveredTo": "Delivered to",
+  "@deliveredTo": {
+    "description": "Delivered to label"
+  },
+  "sent": "Sent",
+  "@sent": {
+    "description": "Sent status"
+  },
+  "received": "Received",
+  "@received": {
+    "description": "Received status"
+  },
+  "read": "Read",
+  "@read": {
+    "description": "Read status"
+  },
+  "now": "Now",
+  "@now": {
+    "description": "Now timestamp"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today timestamp"
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Yesterday timestamp"
+  },
+  "minutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@minutesAgo": {
+    "description": "Minutes ago timestamp",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@hoursAgo": {
+    "description": "Hours ago timestamp",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@daysAgo": {
+    "description": "Days ago timestamp",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orWord": "or",
+  "@orWord": {
+    "description": "Conjunction word 'or'"
+  },
+  "andWord": "and",
+  "@andWord": {
+    "description": "Conjunction word 'and'"
+  },
+  "toWord": "to",
+  "@toWord": {
+    "description": "Preposition word 'to'"
+  },
+  "fromWord": "from",
+  "@fromWord": {
+    "description": "Preposition word 'from'"
+  },
+  "inWord": "in",
+  "@inWord": {
+    "description": "Preposition word 'in'"
+  },
+  "atWord": "at",
+  "@atWord": {
+    "description": "Preposition word 'at'"
+  },
+  "onWord": "on",
+  "@onWord": {
+    "description": "Preposition word 'on'"
+  },
+  "byWord": "by",
+  "@byWord": {
+    "description": "Preposition word 'by'"
+  },
+  "withWord": "with",
+  "@withWord": {
+    "description": "Preposition word 'with'"
+  },
+  "withoutWord": "without",
+  "@withoutWord": {
+    "description": "Preposition word 'without'"
+  },
+  "forWord": "for",
+  "@forWord": {
+    "description": "Preposition word 'for'"
+  },
+  "notAvailable": "—",
+  "@notAvailable": {
+    "description": "Not available placeholder"
+  },
+  "comingSoon": "Coming soon",
+  "@comingSoon": {
+    "description": "Coming soon label"
+  },
+  "betaLabel": "Beta",
+  "@betaLabel": {
+    "description": "Beta feature label"
+  },
+  "newLabel": "New",
+  "@newLabel": {
+    "description": "New feature label"
+  },
+  "nameMinLength": "Name must be at least 3 characters",
+  "@nameMinLength": {
+    "description": "Name minimum length validation"
+  }
+}

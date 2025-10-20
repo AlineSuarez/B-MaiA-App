@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
 import 'home_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
@@ -82,11 +83,12 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleEmailLogin() async {
+    final l10n = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
     final pass = _passwordController.text;
 
     if (email.isEmpty || pass.isEmpty) {
-      _showErrorMessage('Por favor, completa todos los campos');
+      _showErrorMessage(l10n.requiredFields);
       return;
     }
 
@@ -114,8 +116,8 @@ class _LoginScreenState extends State<LoginScreen>
         SnackBar(
           content: Text(
             nombre.isNotEmpty
-                ? '¡Bienvenida $nombre!'
-                : '¡Inicio de sesión exitoso!',
+                ? '${l10n.welcomeBack} $nombre!'
+                : l10n.loginSuccess,
           ),
         ),
       );
@@ -132,6 +134,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleGoogleLogin() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isLoadingGoogle = true);
 
     try {
@@ -146,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen>
       // 2) Tokens de Google
       final GoogleSignInAuthentication auth = await account.authentication;
       final String? idToken = auth.idToken;
-      if (idToken == null) throw Exception('No se recibió id_token de Google');
+      if (idToken == null) throw Exception('Google token error');
 
       // 3) Login en tu API con el id_token
       final data = await _auth.loginWithGoogle(idToken: idToken);
@@ -167,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('¡Bienvenido!')));
+      ).showSnackBar(SnackBar(content: Text(l10n.welcome)));
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
@@ -204,6 +207,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final media = MediaQuery.of(context);
     final screenWidth = media.size.width;
     final screenHeight = media.size.height;
@@ -262,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   SizedBox(height: isTablet ? 32 : 24),
                                   // TEXTO DE BIENVENIDA
                                   Text(
-                                    'Bienvenido',
+                                    l10n.welcome,
                                     style: TextStyle(
                                       fontSize: isTablet ? 28 : 22,
                                       fontWeight: FontWeight.bold,
@@ -273,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                   SizedBox(height: isTablet ? 8 : 6),
                                   Text(
-                                    'Inicia sesión para continuar con B-MaiA',
+                                    l10n.signInToContinue,
                                     style: TextStyle(
                                       fontSize: isTablet ? 14 : 12,
                                       color: Colors.white.withValues(
@@ -284,11 +288,11 @@ class _LoginScreenState extends State<LoginScreen>
                                     textAlign: TextAlign.center,
                                   ),
                                   SizedBox(height: isTablet ? 32 : 24),
-                                  _buildLoginForm(isTablet),
+                                  _buildLoginForm(l10n, isTablet),
                                   SizedBox(height: isTablet ? 24 : 20),
-                                  _buildGoogleLoginButton(isTablet),
+                                  _buildGoogleLoginButton(l10n, isTablet),
                                   SizedBox(height: isTablet ? 20 : 16),
-                                  _buildFooter(isTablet),
+                                  _buildFooter(l10n, isTablet),
                                 ],
                               ),
                             ),
@@ -322,7 +326,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 // TEXTO DE BIENVENIDA ADAPTATIVO
                                 Flexible(
                                   child: Text(
-                                    'Bienvenido',
+                                    l10n.welcome,
                                     style: TextStyle(
                                       fontSize: isTablet
                                           ? (screenWidth > 900 ? 32 : 24)
@@ -339,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 SizedBox(height: isTablet ? 8 : 6),
                                 Flexible(
                                   child: Text(
-                                    'Inicia sesión para continuar con B-MaiA',
+                                    l10n.signInToContinue,
                                     style: TextStyle(
                                       fontSize: isTablet
                                           ? (screenWidth > 900 ? 16 : 13)
@@ -377,11 +381,11 @@ class _LoginScreenState extends State<LoginScreen>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _buildLoginForm(isTablet),
+                                  _buildLoginForm(l10n, isTablet),
                                   SizedBox(height: isTablet ? 24 : 20),
-                                  _buildGoogleLoginButton(isTablet),
+                                  _buildGoogleLoginButton(l10n, isTablet),
                                   SizedBox(height: isTablet ? 20 : 16),
-                                  _buildFooter(isTablet),
+                                  _buildFooter(l10n, isTablet),
                                 ],
                               ),
                             ),
@@ -469,7 +473,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildLoginForm(bool isTablet) {
+  Widget _buildLoginForm(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -477,7 +481,7 @@ class _LoginScreenState extends State<LoginScreen>
           CustomTextField(
             controller: _emailController,
             focusNode: _emailFocus,
-            hintText: 'Correo electrónico',
+            hintText: l10n.email,
             keyboardType: TextInputType.emailAddress,
             prefixIcon: Icons.email_outlined,
             isTablet: isTablet,
@@ -487,7 +491,7 @@ class _LoginScreenState extends State<LoginScreen>
           CustomTextField(
             controller: _passwordController,
             focusNode: _passwordFocus,
-            hintText: 'Contraseña',
+            hintText: l10n.password,
             obscureText: !_isPasswordVisible,
             prefixIcon: Icons.lock_outline_rounded,
             isTablet: isTablet,
@@ -530,7 +534,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     )
                   : Text(
-                      'Iniciar Sesión',
+                      l10n.login,
                       style: TextStyle(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
@@ -544,7 +548,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildGoogleLoginButton(bool isTablet) {
+  Widget _buildGoogleLoginButton(AppLocalizations l10n, bool isTablet) {
     return SlideTransition(
       position: _slideAnimation,
       child: Column(
@@ -568,7 +572,7 @@ class _LoginScreenState extends State<LoginScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'o continúa con',
+                  l10n.orWord,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: isTablet ? 12 : 11,
@@ -629,7 +633,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         SizedBox(width: 12),
                         Text(
-                          'Continuar con Google',
+                          l10n.continueWithGoogle,
                           style: TextStyle(
                             fontSize: isTablet ? 14 : 13,
                             fontWeight: FontWeight.w600,
@@ -646,7 +650,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildFooter(bool isTablet) {
+  Widget _buildFooter(AppLocalizations l10n, bool isTablet) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Column(
@@ -660,7 +664,7 @@ class _LoginScreenState extends State<LoginScreen>
               );
             },
             child: Text(
-              '¿Olvidaste tu contraseña?',
+              l10n.forgotPassword,
               style: TextStyle(
                 color: const Color(0xFF4a5bb8),
                 fontSize: isTablet ? 12 : 11,
@@ -673,12 +677,13 @@ class _LoginScreenState extends State<LoginScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '¿No tienes cuenta? ',
+                l10n.noAccount,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.7),
                   fontSize: isTablet ? 12 : 11,
                 ),
               ),
+              const SizedBox(width: 4),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
@@ -693,7 +698,7 @@ class _LoginScreenState extends State<LoginScreen>
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: Text(
-                  'Regístrate',
+                  l10n.register,
                   style: TextStyle(
                     color: const Color(0xFF4a5bb8),
                     fontSize: isTablet ? 12 : 11,
