@@ -22,21 +22,80 @@ class _HomeScreenState extends State<HomeScreen>
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+  Animation<double>? _fadeAnimation;
+  Animation<double>? _scaleAnimation;
+  Animation<Offset>? _slideAnimation;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _showSuggestions = true;
+
+  final List<Map<String, dynamic>> _suggestions = [
+    {'icon': Icons.hive_rounded, 'text': '¿Cómo crear un nuevo apiario?'},
+    {
+      'icon': Icons.calendar_today_rounded,
+      'text': '¿Cómo planificar tareas para mis colmenas?',
+    },
+    {'icon': Icons.map_rounded, 'text': '¿Qué es la zonificación en B-MaiA?'},
+    {
+      'icon': Icons.analytics_rounded,
+      'text': '¿Cómo monitorear el estado de mis colmenas?',
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
 
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
     );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
+      ),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+          ),
+        );
+
     _animationController.forward();
+
+    _messageController.addListener(() {
+      _updateSuggestionsVisibility();
+    });
+
+    _focusNode.addListener(() {
+      _updateSuggestionsVisibility();
+    });
+  }
+
+  // Método centralizado para actualizar visibilidad de sugerencias
+  void _updateSuggestionsVisibility() {
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    final hasMessages = chatProvider.hasMessages;
+    final hasText = _messageController.text.trim().isNotEmpty;
+    final shouldShow =
+        !hasMessages &&
+        !hasText &&
+        (!_focusNode.hasFocus || _messageController.text.isEmpty);
+
+    if (_showSuggestions != shouldShow) {
+      setState(() => _showSuggestions = shouldShow);
+    }
   }
 
   @override
@@ -93,6 +152,10 @@ class _HomeScreenState extends State<HomeScreen>
     chatProvider.sendMessage(message);
     _messageController.clear();
     _focusNode.unfocus();
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _updateSuggestionsVisibility();
+    });
   }
 
   @override
@@ -143,7 +206,12 @@ class _HomeScreenState extends State<HomeScreen>
         body: BackgroundGradient(
           child: SafeArea(
             child: GestureDetector(
-              onTap: _unfocusInput,
+              onTap: () {
+                _unfocusInput();
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  _updateSuggestionsVisibility();
+                });
+              },
               child: Column(
                 children: [
                   // Header
@@ -167,6 +235,10 @@ class _HomeScreenState extends State<HomeScreen>
                             isKeyboardVisible,
                           ),
                   ),
+
+                  // Sugerencias de preguntas - solo si NO hay conversación
+                  if (!hasMessages)
+                    _buildSuggestionsBar(isTablet, screenWidth, isDark),
 
                   // Input de mensaje
                   _buildMessageInput(
@@ -215,34 +287,18 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
 
-          SizedBox(width: isTablet ? 16 : 12),
-
-          // Título
+          // Título centrado
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.appName,
-                  style: TextStyle(
-                    fontSize: isTablet ? 20 : 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF2f43a7),
-                    letterSpacing: 0.5,
-                  ),
+            child: Center(
+              child: Text(
+                l10n.appName,
+                style: TextStyle(
+                  fontSize: isTablet ? 20 : 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                  letterSpacing: 0.5,
                 ),
-                if (!hasMessages)
-                  Text(
-                    l10n.intelligentAssistant,
-                    style: TextStyle(
-                      fontSize: isTablet ? 13 : 11,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.7)
-                          : const Color(0xFF2f43a7).withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
 
@@ -289,193 +345,255 @@ class _HomeScreenState extends State<HomeScreen>
     bool isDark,
     bool isKeyboardVisible,
   ) {
-    if (isKeyboardVisible) {
-      // Estado compacto cuando el teclado está visible
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                l10n.helloBMaia,
-                style: TextStyle(
-                  fontSize: isTablet ? 20 : 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF2f43a7),
-                  letterSpacing: 0.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: isTablet ? 8 : 6),
-              Text(
-                l10n.writeFirstQuestion,
-                style: TextStyle(
-                  fontSize: isTablet ? 14 : 12,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.7)
-                      : const Color(0xFF2f43a7).withValues(alpha: 0.7),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    final orientation = MediaQuery.of(context).orientation;
+    final isLandscape = orientation == Orientation.landscape;
 
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.06,
-          vertical: isTablet ? 20 : 16,
-        ),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      switchInCurve: Curves.easeInOut,
+      switchOutCurve: Curves.easeInOut,
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.1),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        );
+      },
+      child: isKeyboardVisible
+          ? _buildCompactState(l10n, isTablet, screenWidth, isDark)
+          : isLandscape
+          ? _buildLandscapeState(l10n, isTablet, screenWidth, isDark)
+          : _buildFullState(l10n, isTablet, screenWidth, isDark),
+    );
+  }
+
+  Widget _buildCompactState(
+    AppLocalizations l10n,
+    bool isTablet,
+    double screenWidth,
+    bool isDark,
+  ) {
+    return Center(
+      key: const ValueKey('compact'),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icono principal
-            Container(
-              padding: EdgeInsets.all(isTablet ? 24 : 20),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF2f43a7), Color(0xFF4a5bb8)],
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.auto_awesome,
-                color: Colors.white,
-                size: isTablet ? 48 : 40,
-              ),
-            ),
-
-            SizedBox(height: isTablet ? 32 : 24),
-
-            // Mensaje de bienvenida
             Text(
-              l10n.helloBMaia,
+              '¡Hola, Soy B-MaiA!',
               style: TextStyle(
-                fontSize: isTablet ? 32 : 28,
+                fontSize: isTablet ? 24 : 20,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : const Color(0xFF2f43a7),
                 letterSpacing: 0.5,
               ),
               textAlign: TextAlign.center,
             ),
-
-            SizedBox(height: isTablet ? 16 : 12),
-
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: isTablet ? 500 : screenWidth * 0.85,
+            SizedBox(height: isTablet ? 8 : 6),
+            Text(
+              '¿En qué te puedo ayudar hoy?',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.7)
+                    : const Color(0xFF2f43a7).withValues(alpha: 0.7),
+                fontWeight: FontWeight.w400,
               ),
-              child: Text(
-                l10n.aiAssistantDescription,
-                style: TextStyle(
-                  fontSize: isTablet ? 16 : 14,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : const Color(0xFF2f43a7).withValues(alpha: 0.8),
-                  height: 1.5,
-                  fontWeight: FontWeight.w400,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              textAlign: TextAlign.center,
             ),
-
-            SizedBox(height: isTablet ? 32 : 24),
-
-            // Sugerencias
-            _buildSuggestions(l10n, isTablet, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSuggestions(AppLocalizations l10n, bool isTablet, bool isDark) {
-    final suggestions = [
-      {'icon': Icons.lightbulb_outline, 'text': l10n.howCanYouHelp},
-      {'icon': Icons.code, 'text': l10n.helpWithProgramming},
-      {'icon': Icons.school_outlined, 'text': l10n.explainConcept},
-      {'icon': Icons.create_outlined, 'text': l10n.helpMeWrite},
-    ];
+  // Nuevo: Estado para modo horizontal
+  Widget _buildLandscapeState(
+    AppLocalizations l10n,
+    bool isTablet,
+    double screenWidth,
+    bool isDark,
+  ) {
+    return FadeTransition(
+      key: const ValueKey('landscape'),
+      opacity: _fadeAnimation ?? const AlwaysStoppedAnimation<double>(1.0),
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Logo a la izquierda
+              ScaleTransition(
+                scale:
+                    _scaleAnimation ??
+                    const AlwaysStoppedAnimation<double>(1.0),
+                child: Container(
+                  padding: EdgeInsets.all(isTablet ? 20 : 16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF2f43a7), Color(0xFF4a5bb8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2f43a7).withOpacity(0.25),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.auto_awesome,
+                    color: Colors.white,
+                    size: isTablet ? 40 : 32,
+                  ),
+                ),
+              ),
 
-    return Column(
-      children: [
-        Text(
-          l10n.trySaying,
-          style: TextStyle(
-            fontSize: isTablet ? 15 : 13,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.7)
-                : const Color(0xFF2f43a7).withValues(alpha: 0.7),
-            fontWeight: FontWeight.w500,
+              SizedBox(width: isTablet ? 32 : 24),
+
+              // Texto a la derecha
+              Flexible(
+                child: SlideTransition(
+                  position:
+                      _slideAnimation ??
+                      const AlwaysStoppedAnimation<Offset>(Offset.zero),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '¡Hola, Soy B-MaiA!',
+                        style: TextStyle(
+                          fontSize: isTablet ? 24 : 20,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF2f43a7),
+                          letterSpacing: 0.5,
+                          height: 1.2,
+                        ),
+                      ),
+                      SizedBox(height: isTablet ? 12 : 8),
+                      Text(
+                        '¿En qué te puedo ayudar hoy?',
+                        style: TextStyle(
+                          fontSize: isTablet ? 16 : 14,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.85)
+                              : const Color(0xFF2f43a7).withValues(alpha: 0.85),
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.3,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          alignment: WrapAlignment.center,
-          children: suggestions.map((suggestion) {
-            return _buildSuggestionChip(
-              suggestion['icon'] as IconData,
-              suggestion['text'] as String,
-              isTablet,
-              isDark,
-            );
-          }).toList(),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildSuggestionChip(
-    IconData icon,
-    String text,
+  Widget _buildFullState(
+    AppLocalizations l10n,
     bool isTablet,
+    double screenWidth,
     bool isDark,
   ) {
-    return GestureDetector(
-      onTap: () {
-        _messageController.text = text;
-        _focusNode.requestFocus();
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: isTablet ? 16 : 12,
-          vertical: isTablet ? 12 : 10,
-        ),
-        decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : const Color(0xFF2f43a7).withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.15)
-                : const Color(0xFF2f43a7).withValues(alpha: 0.2),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+    return FadeTransition(
+      key: const ValueKey('full'),
+      opacity: _fadeAnimation ?? const AlwaysStoppedAnimation<double>(1.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: const Color(0xFF4a5bb8),
-              size: isTablet ? 18 : 16,
+            // Logo animado con fondo circular azul
+            ScaleTransition(
+              scale:
+                  _scaleAnimation ?? const AlwaysStoppedAnimation<double>(1.0),
+              child: Container(
+                padding: EdgeInsets.all(isTablet ? 28 : 24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2f43a7), Color(0xFF4a5bb8)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2f43a7).withOpacity(0.25),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.auto_awesome,
+                  color: Colors.white,
+                  size: isTablet ? 56 : 48,
+                ),
+              ),
             ),
-            SizedBox(width: isTablet ? 8 : 6),
-            Text(
-              text,
-              style: TextStyle(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.9)
-                    : const Color(0xFF2f43a7).withValues(alpha: 0.9),
-                fontSize: isTablet ? 14 : 12,
-                fontWeight: FontWeight.w500,
+
+            SizedBox(height: isTablet ? 48 : 40),
+
+            // Texto principal con animación de deslizamiento
+            SlideTransition(
+              position:
+                  _slideAnimation ??
+                  const AlwaysStoppedAnimation<Offset>(Offset.zero),
+              child: Column(
+                children: [
+                  // "¡Hola, Soy B-MaiA!" sin emoji y sin fondo
+                  Text(
+                    '¡Hola, Soy B-MaiA!',
+                    style: TextStyle(
+                      fontSize: isTablet ? 28 : 24,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                      letterSpacing: 0.5,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  SizedBox(height: isTablet ? 24 : 20),
+
+                  // Pregunta sin icono
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: isTablet ? 600 : screenWidth * 0.85,
+                    ),
+                    child: Text(
+                      '¿En qué te puedo ayudar hoy?',
+                      style: TextStyle(
+                        fontSize: isTablet ? 20 : 18,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.85)
+                            : const Color(0xFF2f43a7).withValues(alpha: 0.85),
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.3,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -668,9 +786,7 @@ class _HomeScreenState extends State<HomeScreen>
                   textInputAction: TextInputAction.newline,
                   textCapitalization: TextCapitalization.sentences,
                   onChanged: (value) {
-                    setState(() {
-                      // Actualiza el estado para habilitar/deshabilitar el botón
-                    });
+                    setState(() {});
                   },
                   onSubmitted: (!isTyping && hasText)
                       ? (_) => _sendMessage()
@@ -755,6 +871,129 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget _buildSuggestionsBar(bool isTablet, double screenWidth, bool isDark) {
+    final orientation = MediaQuery.of(context).orientation;
+    final isLandscape = orientation == Orientation.landscape;
+
+    // Altura reducida en landscape
+    final barHeight = isLandscape ? (isTablet ? 50 : 45) : (isTablet ? 70 : 60);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      height: _showSuggestions ? barHeight.toDouble() : 0,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: _showSuggestions ? 1.0 : 0.0,
+        child: Container(
+          padding: EdgeInsets.only(
+            left: screenWidth * 0.04,
+            right: screenWidth * 0.04,
+            bottom: isLandscape ? (isTablet ? 6 : 4) : (isTablet ? 12 : 8),
+          ),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _suggestions.length,
+            separatorBuilder: (context, index) => SizedBox(
+              width: isLandscape ? (isTablet ? 8 : 6) : (isTablet ? 12 : 10),
+            ),
+            itemBuilder: (context, index) {
+              final suggestion = _suggestions[index];
+              return _buildSuggestionChip(
+                suggestion['icon'] as IconData,
+                suggestion['text'] as String,
+                isTablet,
+                isDark,
+                isLandscape,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuggestionChip(
+    IconData icon,
+    String text,
+    bool isTablet,
+    bool isDark,
+    bool isLandscape,
+  ) {
+    // Tamaños más pequeños en landscape
+    final horizontalPadding = isLandscape
+        ? (isTablet ? 12 : 10)
+        : (isTablet ? 16 : 14);
+    final verticalPadding = isLandscape
+        ? (isTablet ? 8 : 6)
+        : (isTablet ? 12 : 10);
+    final iconSize = isLandscape ? (isTablet ? 16 : 14) : (isTablet ? 20 : 18);
+    final fontSize = isLandscape ? (isTablet ? 12 : 11) : (isTablet ? 14 : 13);
+    final borderRadius = isLandscape
+        ? (isTablet ? 16 : 14)
+        : (isTablet ? 20 : 18);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          _messageController.text = text;
+          _focusNode.requestFocus();
+        },
+        borderRadius: BorderRadius.circular(borderRadius.toDouble()),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding.toDouble(),
+            vertical: verticalPadding.toDouble(),
+          ),
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color(0xFF23234A).withValues(alpha: 0.6)
+                : Colors.white.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(borderRadius.toDouble()),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : const Color(0xFF2f43a7).withValues(alpha: 0.15),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.2)
+                    : const Color(0xFF2f43a7).withValues(alpha: 0.08),
+                blurRadius: isLandscape ? 6 : 8,
+                offset: Offset(0, isLandscape ? 1 : 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : const Color(0xFF2f43a7),
+                size: iconSize.toDouble(),
+              ),
+              SizedBox(width: isLandscape ? 6 : (isTablet ? 10 : 8)),
+              Text(
+                text,
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF2f43a7),
+                  fontSize: fontSize.toDouble(),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showClearChatDialog(AppLocalizations l10n, bool isDark) {
     showDialog(
       context: context,
@@ -806,6 +1045,9 @@ class _HomeScreenState extends State<HomeScreen>
                 listen: false,
               ).clearCurrentChat();
               Navigator.pop(context);
+              Future.delayed(const Duration(milliseconds: 100), () {
+                _updateSuggestionsVisibility();
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange.withValues(alpha: 0.8),

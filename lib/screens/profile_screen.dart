@@ -107,6 +107,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _resolveRegionComunaNames();
 
       if (mounted) setState(() => _loading = false);
+    } on DioException catch (e) {
+      // Manejo específico de errores HTTP (p. ej. 502)
+      final status = e.response?.statusCode;
+      final serverMessage = status != null
+          ? 'Error del servidor ($status). Inténtalo más tarde.'
+          : 'Error de red. Revisa tu conexión.';
+      if (mounted) {
+        setState(() => _loading = false);
+        _showErrorMessage(serverMessage);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -165,10 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _comunaName = _comunasMap[_idComuna!];
       }
       if (mounted) setState(() {});
-    } catch (_) {
-      // Silenciar: si no existen endpoints, dejamos IDs sin resolver.
-      // No mostramos snackbar para no molestar a la usuaria.
-    }
+    } catch (_) {}
   }
 
   Future<void> _loadLookupsIfNeeded(Dio dio) async {
@@ -183,6 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             (e['id'] as num).toInt(): (e['name'] ?? e['nombre'] ?? '')
                 .toString(),
         };
+      } on DioException catch (_) {
       } catch (_) {
         /* ignorar */
       }
@@ -199,9 +207,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             (e['id'] as num).toInt(): (e['name'] ?? e['nombre'] ?? '')
                 .toString(),
         };
-      } catch (_) {
-        /* ignorar */
-      }
+      } on DioException catch (_) {
+      } catch (_) {}
     }
   }
 
